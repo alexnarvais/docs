@@ -127,8 +127,7 @@ ___
     ```shell
     sudo ufw status numbered
     ```
-12. Goto any MariaDB server (mdb-01, mdb-02, or mdb-03) and create an mqtt database, user to access the database, 
-    table in the database, and user in the table, using the following commands:  
+12. Goto any MariaDB server (mdb-01, mdb-02, or mdb-03) and the mqtt database and tables, using the following commands:  
     1. Access the MariaDB shell:  
        ```shell 
        sudo mariadb -u root -p
@@ -163,29 +162,30 @@ ___
        USE mqtt;
        ```
     5. Create the **mqtt_user** table in the **mqtt** database:  
-       ```mariadb
-       CREATE TABLE `mqtt_user` (
-       `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-       `username` varchar(100) DEFAULT NULL,
-       `password_hash` varchar(100) DEFAULT NULL,
-       `salt` varchar(35) DEFAULT NULL,
-       `is_superuser` tinyint(1) DEFAULT 0,
-       `created` datetime DEFAULT NULL,
-       PRIMARY KEY (`id`),
-       UNIQUE KEY `mqtt_username` (`username`)
-       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-       ```
-    6. Create a user in the **mqtt_user** table. 
-       ```mariadb
-       INSERT INTO mqtt_user(username, password_hash, salt, is_superuser) 
-       VALUES ('mqtt', SHA2('V#2Rs%2E7%vem8', 256), NULL, 0);
-       ```
-    7. Check that the user was created. 
-       ```mariadb
-       SELECT * FROM mqtt.mqtt_user;
-       ```
+        1. Create the table.
+           ```mariadb
+           CREATE TABLE `mqtt_user` (
+           `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+           `username` varchar(100) DEFAULT NULL,
+           `password_hash` varchar(100) DEFAULT NULL,
+           `salt` varchar(35) DEFAULT NULL,
+           `is_superuser` tinyint(1) DEFAULT 0,
+           `created` datetime DEFAULT NULL,
+           PRIMARY KEY (`id`),
+           UNIQUE KEY `mqtt_username` (`username`)
+           ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+           ```
+        2. Create a user in the **mqtt_user** table.
+           ```mariadb
+           INSERT INTO mqtt_user(username, password_hash, salt, is_superuser) 
+           VALUES ('mqtt', SHA2('V#2Rs%2E7%vem8', 256), NULL, 0);
+           ```
+        3. Check that the user was created. 
+           ```mariadb
+           SELECT * FROM mqtt.mqtt_user;
+           ```
     **NOTE**: Step 12 only has to be executed once, when creating the first EMQX node. 
-    If yes, skip **step 12** and continue to **step 13** below.   
+              If yes, skip **step 12** and continue to **step 13** below.    
 13. Install EMQX on Ubuntu using the following commands: 
     1. Download the EMQX repository:  
        ```shell
@@ -199,19 +199,25 @@ ___
        ```shell
        sudo systemctl start emqx
        ```
-    4. Reset the default administrative user password, to access the EMQX dashboard using the following command:  
-       ```shell
-       emqx ctl admins passwd admin <one_extra_rich_capital_pound>
-       ```
-       **NOTE**: Only reset the default administrative user password on the first node, once the remaining 
-       nodes join the cluster, the credentials will be propagated to the nodes.    
-    5. Access the EMQX dashboard and verify the login by using the domain name or IP address of the host where 
-       EMQX is being configured, using the url below:  
+    4. Access the EMQX dashboard and reset the default login password by using the domain name or IP address 
+       of the host where EMQX is being configured, using the url below:  
 
-       > **http://EMQX-Server-IP-Address:18083/** 
+       > **http://EMQX-Server-IP-Address:18083/**  
        
-       **NOTE**: Only login with the updated credentials on the first node in the cluster, for the remaining nodes 
-       just verify the EMQX dashboard is accessible. 
+       > default username = admin  
+         default password = public  
+         new password = <one_extra_rich_capital_cat>   
+
+       **NOTE 1**: An alternative way of resetting the password is by using the EMQX command line. There exist some 
+       issues at the current version with some special characters. The command line will accept the special character,
+       but when using the password to access the dashboard, the password is not accepted.   
+       ```shell
+       emqx ctl admins passwd admin <one_extra_rich_capital_cat> 
+       ```
+       **NOTE 2**: Only login with the updated credentials on the first node in the cluster, for the remaining nodes 
+       just verify the EMQX dashboard is accessible. The password only needs to be reset on the first node, once 
+       the remaining nodes join the cluster, the credentials will be propagated to the nodes.  
+       
 14. Edit the main EMQX broker configuration file using the following command:  
     ```shell 
     sudo nano /etc/emqx/emqx.conf
@@ -252,7 +258,7 @@ ___
        username = "emqx"
        password = "<one_extra_rich_capital_cat>"
        pool_size = 8
-       query = "SELECT password_hash FROM mqtt_user where username = '${username}' LIMIT 1;"
+       query = "SELECT password_hash FROM mqtt_user where username = ${username} LIMIT 1"
        query_timeout = "5s"
        password_hash_algorithm {
          name = sha256
@@ -375,7 +381,7 @@ ___
        ```
        **NOTE 1**: Comment out any existing variable names that are similar to the names in the new configuration 
        for the **[global]** section above.
-       Variables that are existing and need to be commented out:  
+       Potential existing variables:  
        
        >  **workgroup**  
           **server string**  
@@ -485,7 +491,7 @@ ___
        ```shell
        sudo ./sentinelone_linux_agent_install.sh
        ```
-       **NOTE:** Ensure that the latest packages from step 1, are in the directory and that the shell script 
+       **NOTE:** Ensure that the latest packages from step 17.1, are in the directory and that the shell script 
        contains the correct path to the latest package and site token (with respect to the site that the machine will join).
        Use the following command to open the shell script, if necessary:  
        ```shell

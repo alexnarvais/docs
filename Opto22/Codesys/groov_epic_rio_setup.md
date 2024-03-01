@@ -20,9 +20,9 @@ ___
    1. Path to configure network settings:  
          > Network/Configure
    2. Make the hostname in the following format:  
-         > opto-grv-<rio_OR_epic>-<IP_Octet3><IP_Octet4>  
-        EX1: If device is RIO with IP address 192.168.1.5 then `hostname = opto-grv-rio-0105`  
-        EX2: If device is EPIC with IP address 192.168.111.555 then `hostname = opto-grv-epic-111555` 
+         > grv-<rio_OR_epic>-<IP_Octet3><IP_Octet4>  
+        EX1: If device is RIO with IP address 192.168.1.5 then `hostname = grv-rio-0105`  
+        EX2: If device is EPIC with IP address 192.168.111.555 then `hostname = grv-epic-111555` 
          
    **NOTE:** Use two digit precision minimum for each IP Octet.  
    
@@ -79,7 +79,21 @@ ___
       ![](img/install_license_ticket_id.png)   
    8. Verify that the runtime was licensed by checking the **Device Log**, see image below for reference:  
       ![](img/codesys_runtime_licensed.png)     
-7. Back to [Main Content](#main-content)  
+7. Follow the sub steps below to download a working program to the device.
+   1. Compile the code to check for errors by using the **Generate Code** tool from the **Build Tab**. 
+   2. Select the **Communication Settings** section from the **Device View Page** and add a device to the **Gateway** 
+      by scanning the network with the **Scan Network** button or manually enter the IP address of the device and then
+      click the device icon above where the IP address was entered to scan for the device.  
+      See the image below for reference:    
+      ![](img/device_communication_settings.png)    
+   3. Select the **Ethernet Adapter** that was added from **Step 4** and set the network interface to the local host 
+      by using the **Browse** button.   
+      See the image below for reference:  
+      ![](img/ethernet_adpater_network_interface.png)     
+   4. Select **Login** from the **Online Tab** to login and download to the device.  
+      See the image below for reference:  
+      ![](img/download_program_to_device.png)      
+8. Back to [Main Content](#main-content)  
 ___
 ## CODESYS IGNITION OPU UA Client/Server Setup
 The Symbol Configuration object will be added to the CODESYS project to expose tags to the CODESYS OPC UA Server and
@@ -176,7 +190,7 @@ ___
 2. After purchasing the license, activate the license to enable access to the shell download license file,
    using the following link:  
    https://www.opto22.com/my-opto/manage-groov/activate-groov  
-3. After the activation a **Download License File** button will appear to enable the license file to be downloaded.   
+3. After the activation, a **Download License File** button will appear to enable the license file to be downloaded.   
    See the image below for reference:      
    ![](img/shell_download_license_File.png)  
 4. Goto the **GROOV Manage** web application and navigate to the **License** page and upload the license from **Step 3**

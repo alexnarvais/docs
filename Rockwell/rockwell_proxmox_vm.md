@@ -216,7 +216,8 @@ ___
     2. Angry IP Scanner
     3. Python
     4. Google Chrome
-    5. Etc...
+    5. Inductive Automation Ignition Designer
+    6. CODESYS Development System IDE
 18. Map any other useful network drives using the sub steps from **Step 13**.  
 19. Adjust the display resolution if necessary, from the BIOS OVMF (UEFI) by restarting the VM and 
     continuously pressing the **esc** key.   

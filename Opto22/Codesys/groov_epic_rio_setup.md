@@ -41,8 +41,13 @@ ___
 
 2. Select a programmable device and the program language for the default Main Task.  
    ![](img/device_and_program_task.png)  
-
-3. Add an Ethernet Adapter using the **Devices View (device tree)**:  
+3. Copy the **Composite Types** folder to the **Application View** that contains all the custom DUTs (Data Unit Type) 
+   and POUs (Program Organization Unit).
+   The **Composite Types** folder can be copied from another project or from the NAS,
+   ensure that the folder has the latest DUTs and POUs before copying.  
+   See the image below for reference:  
+   ![](img/composite_types_folder.png)   
+4. Add an Ethernet Adapter using the **Devices View (device tree)**:  
    1. Right-Click and add the device.  
       ![](img/add_device.png)   
    2. Select **All vendors** from the Vendor dropdown and add an **Ethernet Adapter**.  
@@ -51,12 +56,12 @@ ___
       ![](img/add_ethernet_adapter_device.png)   
    4. Add the GROOV EPIC/RIO as the device. 
       ![](img/ethernet_adapter_device_type.png)
-4. Configure the I/O on GROOV EPIC/RIO using the **Devices View (device tree)**:  
+5. Configure the I/O on GROOV EPIC/RIO using the **Devices View (device tree)**:  
    1. Plug a device for each empty slot of the GROOV EPIC/RIO by right-clicking on the device and selecting **Plug Device**.  
    ![](img/plug_device.png)  
    2. Select the signal type or IO module for each empty slot that's being plugged.  
    ![](img/plug_device_signal_type.png) 
-5. License the Codesys Runtime Engine on the EPIC/RIO
+6. License the Codesys Runtime Engine on the EPIC/RIO
    1. Purchase a license using the following link:  
       https://www.opto22.com/products/product-selector?c1=32&c2=34
    2. After purchasing the license, activate the license to retrieve a Codesys Ticket ID using the following link:  
@@ -67,14 +72,14 @@ ___
       ![](img/license_manger_select_target.png)
    5. From the **Select Container** prompt select **Soft container**, see the image below for reference:  
       ![](img/license_manger_select_container.png)  
-   6. From the **Select Device** prompt slect the network path to the controller by either scanning for the device
+   6. From the **Select Device** prompt select the network path to the controller by either scanning for the device
       or adding the device then selecting OK, see the image below for reference:   
       ![](img/license_manger_select_device.png)   
    7. Select the **Install Licenses** button and activate the license using the **Codesys Ticket ID** from **Step 5.2**:  
       ![](img/install_license_ticket_id.png)   
    8. Verify that the runtime was licensed by checking the **Device Log**, see image below for reference:  
-      ![](img/codesys_runtime_licensed.png)    
-6. Back to [Main Content](#main-content)  
+      ![](img/codesys_runtime_licensed.png)     
+7. Back to [Main Content](#main-content)  
 ___
 ## CODESYS IGNITION OPU UA Client/Server Setup
 The Symbol Configuration object will be added to the CODESYS project to expose tags to the CODESYS OPC UA Server and

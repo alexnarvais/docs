@@ -82,8 +82,8 @@ ___
 7. Follow the sub steps below to download a working program to the device.
    1. Compile the code to check for errors by using the **Generate Code** tool from the **Build Tab**. 
    2. Select the **Communication Settings** section from the **Device View Page** and add a device to the **Gateway** 
-      by scanning the network with the **Scan Network** button or manually enter the IP address of the device and then
-      click the device icon above where the IP address was entered to scan for the device.  
+      by scanning the network with the **Scan Network** button or manually entering the IP address of the device 
+      and pressing **enter**.  
       See the image below for reference:    
       ![](img/device_communication_settings.png)    
    3. Select the **Ethernet Adapter** that was added from **Step 4** and set the network interface to the local host 
@@ -111,20 +111,24 @@ Perform the following to add a **Symbol Configuration** object in the offline mo
    See the image below for reference:   
    ![](img/symbol_configuration_tag_build.png)  
 4. Download the new configurations.
-5. Create a Codesys OPC UA Server certificate on the device, using the following path and steps:  
-   1. Use the following path to generate 
-       
-      > **View/Security Screen/Devices/Device**  
-     
-      NOTE: If **NO** device information is available, then click the **Refresh Button** 
-            recheck the available list of devices, see the image below for reference:
-      ![](img/refresh_opcua_device_certificates.png)
-   2. Generate a certificate for the **OPC-UA Server**, **Encrypted Communication**, and **Encrypted Application**,
+5. Create a Codesys OPC UA Server certificate on the device, using the following sub steps:  
+   1. Launch the **Security Screen** from the **View Tab**. 
+      See the image below for reference:  
+      ![](img/security_view_screen.png)     
+   2. Select the **Devices Tab** and click the **Refresh Button** to check the available list of devices.  
+      See the image below for reference:   
+       ![](img/refresh_opcua_device_certificates.png)   
+      **NOTE:** If the **Devices Tab** isn't shown when launching the **Security Screen** then
+                the **CODESYS Security Agent Package** will need to be installed using the 
+                **CODESYS Installer Application** and then selecting the Browse Tab from the Add-ons section.   
+      See the image below for reference:    
+      ![](img/codesys_installer.png)   
+   3. Generate a certificate for the **OPC-UA Server**, **Encrypted Communication**, and **Encrypted Application**,
      see image below for reference:  
      ![](img/create_opcua_certificate.png)    
-   3. Set the **Key length = 4096** and **Validated period = max days (3650)**, see image below for reference:  
+   4. Set the **Key length = 4096** and **Validated period = max days (3650)**, see image below for reference:  
     ![](img/certificate_settings.png)  
-   4. Make note of the validation period for each certificate as in the image below:    
+   5. Make note of the validation period for each certificate as in the image below:    
       ![](img/certificate_validation_information.png)   
 
 6. Goto the Ignition Gateway where the OPC connection will be created, and select **Create new OPC Connection**.
@@ -141,14 +145,9 @@ Perform the following to add a **Symbol Configuration** object in the offline mo
         Security Policy and Mode Configuration = {name = opc.tcp://IPv4_Address:4840/discovery, Policy = Basic256Sha256, Mode = SignAndEncrypt}   
       
       See the image below for reference:   
-      ![](img/select_opcua_connection.png)    
-       
-      **NOTE 1:** If there's no option to set the Security Policy and Mode, then select **Skip to Advanced Configuration**.   
+      ![](img/select_opcua_connection.png)
       
-      See the image below for reference:   
-      ![](img/opcua_connect_advanced_config.png)   
-      
-      **NOTE 2:** The connection will fault out because the certificate isn't trusted yet in Codesys.   
+      **NOTE:** The connection will fault out because the certificate isn't trusted yet in CODESYS.   
    
 7. Goto the CODESYS IDE and trust the **Ignition OPC UA Client** certificate using the following sub steps:  
    1. Check that the **Ignition OPC UA Client** certificate is visible under the **Quarantined Certificates** folder
@@ -160,22 +159,24 @@ Perform the following to add a **Symbol Configuration** object in the offline mo
       ![](img/ignition_quarantined_certificates.png)   
    
    2. Move the **Ignition OPC UA Client** certificate from **Quarantined Certificates** to the **Trusted Certificates**
-      folder.  
-      
-      See the image below for reference:    
+      folder.
+      If there exist an **Ignition MASTER/BACKUP** pair, then two certificates will need to be **Trusted**. 
+   
+      See the image below that shows two trusted certificates for **Ignition MASTER/BACKUP** pair:    
       ![](img/ignition_trusted_certificates.png)   
    
    **NOTE:** If the certificates are not being quarantined in the CODESYS IDE, then it's possible 
              that a power cycle will need to be performed on the GROOV RIO/EPIC.   
    
 8. Goto the Ignition Gateway and trust the CODESYS OPC UA Server certificate, using the following sub steps:  
-   1. Navigate to the **Client Security** page and trust the quarantined Codesys OPC UA Server certificate using 
+   1. Navigate to the **Client Security** page and trust the **Quarantined Codesys OPC UA Server Certificate** using 
       the following path:   
       
       > Config/OPC UA/Security/Client Tab     
 
       See the image below for reference:    
       ![](img/codesys_quarantined_certificates.png)     
+   **NOTE:** If there exist an **Ignition MASTER/BACKUP pair**, then goto each gateway and **Trust** the certificate.  
    2. Verify the OPC client connection was established to the CODESYS OPC UA Server, using the following path:  
     
       > Config/OPC Client/OPC Connections  

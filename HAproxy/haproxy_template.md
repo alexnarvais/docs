@@ -1,25 +1,31 @@
 # HAProxy Virtual Machine Template Setup
-This document is merely to give a starting point for an HAProxy VM with base settings. When creating a clone of this template,
+This document is merely to give a starting point for a HAProxy VM with base settings. When creating a clone of this template,
 the parameter value placeholders that exist in the various configuration files will need to be updated, additional configuration 
 files might need to be created, and existing or new daemon services will need to started or installed. 
 
 **NOTE**: Select **Ctrl+X** to exit the nano text editor, enter **Y** to save the file, and press the **Enter** key to keep the exising file name.
 ___
-1. Make a full clone of the template (**base-ubuntu-template**) and set the following settings below:
+1. Right-click and perform a full clone of the base Ubuntu template (**base-ubuntu-template**) and set the following settings below:  
 
-   > Mode = Full Clone  
-   > Target Storage = Same as source  
+   > Mode = **Full Clone**  
+   > Target Storage = **Same as source**  
    > Name = base-haproxy-template  
-   > Resource Pool = None  
-   > Format = QEMU image format  
    > VM ID = <next_available_address_in_the_thousands>  
-    
-   **Leave the default VM hardware settings and start the VM.** 
-2. Update the hostname from **base_ubuntu** to **base-haproxy** using the following command:   
+   > All Other Settings = **Default**
+
+2. Leave the default hardware settings. 
+3. Start the virtual machine using the **Start** button.  
+4. Update and upgrade the operating system using the following commands:   
+   ```shell
+   sudo apt update && sudo apt upgrade -y
+   ```
+   **NOTE:** If prompted to select which daemon services should be restarted, then accept the default selections, 
+   press the **tab** key to navigate between the selections. 
+5. Update the hostname from **base_ubuntu** to **base-haproxy** using the following command:   
    ```shell
    sudo nano /etc/hostname
    ``` 
-3. Edit the hosts file using the following command:  
+6. Edit the hosts file using the following command:  
    ```shell
    sudo nano /etc/hosts
    ```
@@ -33,60 +39,54 @@ ___
    ```
    Settings should look similar to the image below:  
    ![](img/base_ad_hosts_file.png)  
-4. Check that the network interface settings in the **00-installer-config.yaml** file are in DHCP, using the following command:  
+7. Check that the network interface settings in the **00-installer-config.yaml** file are in DHCP, using the following command:  
    ```shell
    sudo nano /etc/netplan/00-installer-config.yaml
    ```
-   Network settings should look similar to the image below:  
+   See the image below for reference:   
    ![](img/netplan_config_dhcp.png)  
-5. Allow tcp port 8404 for access to the haproxy static web page, the port is arbitrary, using the **ufw** command:  
+8. Allow tcp port 8404 for access to the haproxy static web page, the port is arbitrary, using the **ufw** command:  
    ```shell
     sudo ufw allow 8404/tcp
    ```
    Verify the above rules have been accepted by issuing the below command:  
    ```shell
-   sudo ufw status
+   sudo ufw status numbered
    ```
-6. Update and upgrade the operating system using the following commands:   
-   ```shell
-   sudo apt update && sudo apt upgrade -y
-   ```
-   **NOTE:** If prompted to select which daemon services should be restarted, then accept the defaults selections, 
-   press the **tab** key to navigate between the selections.  
-
-7. Reboot the machine using the following command:  
+9. Reboot the machine using the following command:  
    ```shell
    sudo reboot
    ``` 
-8. Edit the **/etc/sysctl.conf** file using the following command:  
-   ```shell
-   sudo nano /etc/sysctl.conf
-   ```
-   Place the following kernel parameter at the end of the file:  
-   ```text
-   net.ipv4.ip_nonlocal_bind = 1
-   ```
-   **NOTE:** This enables the application to bind to an IP address that is nonlocal, meaning the IP address is not assigned to a
-   device on the current system. In the case of the high availability system setup (heartbeat or fail over setup) where
-   one system takes over another system's IP address if that system fails.    
-9. Add and install the HAProxy repository, target package, and hard dependencies using the following command:  
-   ```shell
-   sudo apt install --no-install-recommends software-properties-common
-   ```
-   Add the vbernat/haproxy-2.8 PPA (Personal Package Archive) to the systems software repositories:  
-   ```shell
-   sudo add-apt-repository ppa:vbernat/haproxy-2.8
-   ```
-   Install haproxy package in the 2.8.x range or greater:  
-   ```shell
-   sudo apt install haproxy=2.8.\* -y
-   ```
-   **NOTE:** If there exist a newer LTS ONLY VERSION past 2.8, then simply replace 2.8 with the latest **LTS** version.  
-10. Install **keepalived** package using the following command:  
+10. Edit the **/etc/sysctl.conf** file using the following command:  
+    ```shell
+    sudo nano /etc/sysctl.conf
+    ```
+    Place the following kernel parameter at the end of the file:  
+    ```text
+    net.ipv4.ip_nonlocal_bind = 1
+    ```
+    **NOTE:** This enables the application to bind to an IP address that is nonlocal, meaning the IP address isn't 
+    assigned to a device on the current system. In the case of the high availability 
+    system setup (heartbeat or fail over setup) where one system takes over another system's IP address,
+    if that system fails.    
+11. Add and install the HAProxy repository, target package, and hard dependencies using the following command:  
+    ```shell
+    sudo apt install --no-install-recommends software-properties-common
+    ```
+    Add the vbernat/haproxy-2.8 PPA (Personal Package Archive) to the systems software repositories:  
+    ```shell
+    sudo add-apt-repository ppa:vbernat/haproxy-2.8
+    ```
+    Install haproxy package in the 2.8.x range or greater:  
+    ```shell
+    sudo apt install haproxy=2.8.\* -y
+    ```
+    **NOTE:** If there exist a newer LTS ONLY VERSION past 2.8, then simply replace 2.8 with the latest **LTS** version.  
+12. Install **keepalived** package using the following command:  
     ```shell
     sudo apt install keepalived -y
     ```
-11. Create the base main **keepalived** file for load balancing and high-availability using the following command:  
+13. Create the base main **keepalived** file for load balancing and high-availability using the following command:  
     ```shell
     sudo nano /etc/keepalived/keepalived.conf
     ```
@@ -139,10 +139,10 @@ ___
    > **state** - If one node is the MASTER, the other will be the BACKUP.  
    > **interface** - Check the interface name being used.   
    > **virtual_router_id** - Use the last octet of the virtual IP address.  
-   > **priority** - The MASTER (101) will have a higher priority than the BACKUP (100).    
+   > **priority** - If one node is MASTER (101), the other will be the BACKUP (100), higher priority will be the MASTER.   
    > **virtual_ipaddress** - Check the available IP network reserved for virtual routers.  
 
-12. Create the **keepalived_script** group and user using the following commands:   
+14. Create the **keepalived_script** group and user using the following commands:   
     ```shell
     sudo groupadd -r keepalived_script
     ``` 
@@ -153,7 +153,7 @@ ___
     ```shell
     groups keepalived_script
     ```
-13. Edit the **sudoers (/etc/sudoers.tmp)** configuration using the command below:  
+15. Edit the **sudoers (/etc/sudoers.tmp)** configuration using the command below:  
     ```shell
     sudo visudo
     ```
@@ -163,7 +163,7 @@ ___
     ```
     The updated **sudoers** configuration file should look similar to the image below:  
     ![](img/sudoers_temp_file.png)  
-14. Ensure that the **keepalived** and **haproxy** service is stopped and disabled to prevent the services from starting 
+16. Ensure that the **keepalived** and **haproxy** service is stopped and disabled to prevent the services from starting 
     at boot, using the following commands:  
     ```shell
     sudo systemctl disable --now keepalived
@@ -178,7 +178,7 @@ ___
     ```shell
     sudo systemctl is-active haproxy
     ```
-15. Setup the base Active Directory settings:
+17. Setup the base Active Directory settings:
     1. Install the necessary Samba and Kerberos packages to integrate with a Windows OS network using the command below:  
        ```shell
        sudo apt install samba krb5-config krb5-user winbind libnss-winbind libpam-winbind -y 
@@ -267,7 +267,7 @@ ___
        ```
        Add the following line to the end of the file:  
        ```text
-       %cansudo All=(ALL:ALL) ALL
+       %cansudo ALL=(ALL:ALL) ALL
        ```
     6. Disable the **smbd** and **winbind** service using the following commands:  
        ```shell
@@ -284,11 +284,11 @@ ___
        ```shell
        sudo pam-auth-update --enable mkhomedir
        ```
-16. Shutdown the VM using the following command:  
+18. Shutdown the VM using the following command:  
     ```shell
     sudo shutdown now
     ```
-17. Select the **CD/DVD Drive** from the **Hardware** section and remove it using the **Remove** button, see the image below:  
+19. Select the **CD/DVD Drive** from the **Hardware** section and remove it using the **Remove** button, see the image below:  
     ![](img/cd_dvd_drive_removal.png)   
-18. Make the VM a template by right-clicking on the VM and selecting **Convert to template**.  
+20. Make the VM a template by right-clicking on the VM and selecting **Convert to template**.  
     ![](img/haproxy_vm_template.png)  

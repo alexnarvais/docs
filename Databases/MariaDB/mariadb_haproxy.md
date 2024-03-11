@@ -1,20 +1,20 @@
 # MariaDB HAProxy Main Content Steps
-Ensure that there exist a functional MariaDB Galera Cluster before creating the HAProxy Load Balancers.
-HAProxy is a software package that can be installed on Linux flavored operating systems which in turn allows the OS to act as a reverse proxy and 
-load balancer. 
+Ensure that there exists a functional MariaDB Galera Cluster before creating the HAProxy Load Balancers.
+HAProxy is a software package that can be installed on Linux flavored operating systems which in turn allows 
+the OS to act as a reverse proxy and load balancer. 
 
 > **Reverse Proxy** - sits in front of your server and accepts request from clients on its behalf.   
 > **Load Balancer** - will split incoming requests among a cluster of servers, keeps track of which server got the 
                       last request, and the server that should get the next request utilizing the cluster equally. 
 ___
-1. Access the Proxmox hypervisor web interface using a web browser and enter the following url in the specified format:  
-    [https://Your-Servers-IP-Address:8006/ ](https://Your-Servers-IP-Address:8006/)
-2. If a base haproxy template (**base-haproxy-template**) is available see the
-   [MariaDB HAProxy Server Node Setup](#Mariadb-haproxy-server-node-setup) section, if not continue to **step 3** in **this section**:
-3. If a base ubuntu template (**base-ubuntu-template**) is available see the **haproxy_template** document then return 
-   to **this document** and jump to **step 2** in **this section**, if not continue in **this section** to **step 4**.
-4. If no base Ubuntu template is available then see the **base-ubuntu build sheet** document which should be located 
-   under the **scada** share on the research **NAS**, then return to **this section** and jump to **step 3**.
+1. Access the PROXMOX Hypervisor web interface using a web browser and enter the following url in the specified format:  
+    **https://Your-Servers-IP-Address:8006/** 
+2. If a base haproxy template (**base-haproxy-template**) is available, then see the
+   [MariaDB HAProxy Server Node Setup](#Mariadb-haproxy-server-node-setup) section, if not continue to **Step 3** in **this section**:
+3. If a base ubuntu template (**base-ubuntu-template**) is available, then see the **haproxy_template** document then
+   jump to **Step 2** in **this section**, if not continue in **this section** to **Step 4**.  
+4. If no base Ubuntu template is available, then see the **base-ubuntu** build sheet then return to
+   **this section** and jump to **Step 3**.  
 5. Steps Complete. 
 
 ## MariaDB HAProxy Server Node Setup
@@ -48,55 +48,66 @@ ___
 3. Set the **Start at boot** checkbox to **true** using the **Options** section from the content panel:  
    ![](img/options_start_at_boot.png)   
 4. Start the virtual machine using the **Start** button.
-5. Update the hostname from **base-haproxy-template** to **mdbh-XX** (where XX is the server number being creating) using the following command:
+5. Update and upgrade the operating system using the following commands:   
+   ```shell
+   sudo apt update && sudo apt upgrade -y
+   ```
+6. Update the hostname from **base-haproxy-template** to **mdbh-XX** (where XX is the server instance) using the following command:  
    ```shell
    sudo nano /etc/hostname
    ```
-6. Update the hosts file using the following command:  
+7. Update the hosts file using the following command:  
    ```shell
    sudo nano /etc/hosts
    ```
-   Remove, update, and uncomment the lines based on the image below with respect to the server being configured:  
-   ![](img/hosts_file_mariadb_haproxy.png)  
+   Overwrite the existing configuration with the following text, replace XX with the server IP address and 
+   instance number:    
+   ```shell
+   127.0.0.1 localhost
+   10.20.XX.XX mdbh-XX.research.pemo mdbh-XX
+   10.20.1.13 ad-01.research.pemo ad-01
+   10.20.5.13 ad-02.research.pemo ad-02
+   10.20.3.13 ad-03.research.pemo ad-03
+   ```
+   See the image below for reference:  
+   ![](img/hosts_file_mariadb_haproxy.png)    
    **NOTE:** IP Address per node server should fall within the following subnets:  
    
    > mdbh-01 - 10.20.20.12/24 and gateway 10.20.20.1  
    > mdbh-02 - 10.20.20.13/24 and gateway 10.20.20.1
 
-7. Reset the machine ID using the following commands:
+8. Reset the machine ID using the following commands:  
    ```shell
    sudo  rm  -f  /etc/machine-id /var/lib/dbus/machine-id
    sudo dbus-uuidgen --ensure=/etc/machine-id
    sudo dbus-uuidgen --ensure
    ```
-8. Regenerate ssh keys using the following commands:
+9. Regenerate ssh keys using the following commands:
    ```shell
    sudo rm /etc/ssh/ssh_host_*
    sudo dpkg-reconfigure openssh-server
    ```
-9. Change the network interface IP address from **DHCP** to **Static** by editing the **00-installer-config.yaml** file, using the following command:   
-    ```shell
-    sudo nano /etc/netplan/00-installer-config.yaml
-    ```
-   Under the network interface key comment out the **dhcp4** key:value pair and then uncomment the remaining lines and configure the network settings accordingly see the image below:  
-   ![](img/netplan_config_mariadb_haproxy.png)  
-   **NOTE:** IP Address per node server should fall within the following subnets:  
+10. Change the network interface IP address from **DHCP** to **Static** by editing the **00-installer-config.yaml** file, using the following command:   
+     ```shell
+     sudo nano /etc/netplan/00-installer-config.yaml
+     ```
+    Under the network interface key comment out the **dhcp4** key:value pair and then uncomment the remaining lines
+    and set the network settings accordingly.  
+    See the image below for reference:    
+    ![](img/netplan_config_mariadb_haproxy.png)  
+    **NOTE:** IP Address per node server should fall within the following subnets:  
    
    > mdbh-01 - 10.20.20.12/24 and gateway 10.20.20.1  
    > mdbh-02 - 10.20.20.13/24 and gateway 10.20.20.1
-   
-10. Update and upgrade the operating system using the following commands:   
-    ```shell
-    sudo apt update && sudo apt upgrade -y
-    ```
-    **NOTE:** If prompted to select which daemon services should be restarted, then accept the default selections, 
-    press the **tab** key to navigate between the selections.
-11. Edit the **Network Device** from the **Hardware** settings of the VM, and assign **VLAN Tag** 20, as in the image below:  
-    ![](img/vm_nic_vlan_tag.png)   
-12. Reboot the machine using the following command:  
+
+11. Reboot the machine using the following command:  
      ```shell
      sudo reboot
-     ```
+     ```   
+12. Edit the **Network Device** from the **Hardware** settings of the VM, and assign **VLAN Tag** 20, as in the image below:  
+    ![](img/vm_nic_vlan_tag.png)   
+    **NOTE:** If prompted to select which daemon services should be restarted, then accept the default selections, 
+    press the **tab** key to navigate between the selections.
 13. Setup the firewall rules to allow incoming traffic from the following types of traffic:  
     **MariaDB database:**
     ```shell
@@ -116,16 +127,17 @@ ___
     ```shell
     sudo nano /etc/keepalived/keepalived.conf
     ```
-    Update **keepalived.conf** file according to the image below:  
+    See the image below for reference:   
     ![](img/keepalived_mariadb_haproxy.png)   
     
-    **NOTE**: The configuration file will need to be updated and the following parameters will change per MASTER/BACKUP pair:  
+    **NOTE**: The configuration file will need to be updated and the following parameters 
+    will change per **MASTER/BACKUP** pair:   
 
-   > **state** - If one node is the MASTER, the other will be the BACKUP.  
-   > **interface** - Check the interface name being used.   
-   > **virtual_router_id** - Use the last octet of the virtual IP address.  
-   > **priority** - The MASTER (101) will have a higher priority than the BACKUP (100).  
-   > **virtual_ipaddress** - Check the available IP network reserved for virtual routers.  
+    > **state** - If one node is the MASTER, the other will be the BACKUP.  
+      **interface** - Check the interface name being used.   
+      **virtual_router_id** - Use the last octet of the virtual IP address.  
+      **priority** - If one node is MASTER (101), the other will be the BACKUP (100), higher priority will be the MASTER.  
+      **virtual_ipaddress** - Check the available IP network reserved for virtual routers.  
    
 15. Update the **haproxy** file for load balancing and high-availability using the following command:   
     ```shell
@@ -187,21 +199,21 @@ ___
      The "weight 1" option informs HAProxy of the server's importance relative to other servers in the cluster. A higher weight
      means it will handle more connections. In this case all servers are treated equally. 
    
-16. Go to each **MariaDB Server** and specify the **MariaDB HAProxy Servers** from which the HAProxy User 
-    can connect to the **MariaDB Server Databases**, using the following SQL commands from the **MariaDB Server Shell**.   
-    Access the MariaDB shell as the root user and prompt for the root password:  
-    ```shell
-    sudo mariadb -u root -p
-    ```
-    Create the haproxy user using the following SQL command:  
-    ```sql
-    CREATE USER 'haproxy'@'10.20.20.12';
-    CREATE USER 'haproxy'@'10.20.20.13';
-    ```
-    Verify the user and hosts were created by executing the following SQL command:  
-    ```sql
-    SELECT User, Host FROM mysql.user;  
-    ```
+16. Go to each **MariaDB Server** and create the **HAProxy User** and host from where the user can connect 
+    to the MariaDB Server, the host will be the **MariaDB HAProxy Servers**.  
+    1. Access the MariaDB shell as the root user and prompt for the root password:  
+       ```shell
+       sudo mariadb -u root -p
+       ```
+    2. Create the haproxy user using the following SQL command:  
+       ```sql
+       CREATE USER 'haproxy'@'10.20.20.12';
+       CREATE USER 'haproxy'@'10.20.20.13';
+       ```
+    3. Verify the user and hosts were created by executing the following SQL command:  
+       ```sql
+       SELECT User, Host FROM mysql.user;  
+       ```
     **NOTE:** Since a MariaDB Galera cluster exists, the initial creation of the haproxy user should have been 
     propagated to the other MariaDB servers, access the MariaDB shell from the other servers and issue the SQL command 
     above to verify. 
@@ -228,10 +240,12 @@ ___
     the word "Keepalived".  
 19. Open a web browser and type the url [http://10.20.20.11:8404/stats](http://10.20.20.11:8404/stats)
     to access the HAProxy stats web page.  
-    If all the MariaDB and HAproxy servers are operating correctly, then frontend and listen tables will be displayed, where 
-    each row corresponds to a server and a color green indicates the server is active and up. A legend is displayed that'll See the image below:   
+    If all the EMQX and HAproxy servers are operating correctly,
+    then frontend, backend and listen tables will be displayed, where each row corresponds to a server and 
+    the color green indicates the server is active and up.  
+    A legend is displayed that'll the row color scheme, see the image below:     
     ![](img/mariadb_haproxy_stats_page.png)  
-20. Access AD-01 and bind the virtual IP to the hostname **mdb.research.pemo** using the following steps:  
+20. Access AD-01 and bind the virtual IP to the hostname **emq.research.pemo** using the following steps:  
     1. Open the **DNS** tools from the **Microsoft Server Manager**, see the image below:   
        ![](img/dns_tools_server_manager.png)  
     2. Create a new host in the **research.pemo** domain under the **Foward Lookup Zones**, see the image below:  
@@ -239,7 +253,7 @@ ___
     3. Bind a new hostname to the virtual IP, see the image below:  
        ![](img/new_host_in_research_domain.png)  
 21. Open a web browser and type the url [http://mdb.research.pemo:8404/stats](http://mdb.research.pemo:8404/stats)
-    to verify that the binding of the new hostname and virtual IP.  
+    to verify the binding of the new hostname and virtual IP.  
 22. Join the MariaDB HAProxy server to the Active Directory:  
     1. Edit the Samba configuration file using the following command:
        ```shell 
@@ -268,19 +282,19 @@ ___
        ```
        **NOTE:** This command will return a list of users from the domain that is connected via **winbind**.  
 
-    5. Verify AD login acceptance into the machine by logging out and in with your AD account. 
+    5. Verify AD login acceptance into the machine by logging out/in with your AD account. 
 23. Install **SentinelOne** cybersecurity software to detect, protect, and remove malicious software.   
     > The following sub steps will explain how to install **SentinelOne** by mounting a NAS (network attached storage) 
       device, then accessing the installation files on the NAS. There are other methods for installation along with uninstalling, 
-      and upgrading **SentinelOne**, if any other method is needed then see the **SentinelOne** setup document that's 
+      and upgrading **SentinelOne**, if any other method is needed, then see the **SentinelOne** setup document
       under a PEMO Site Automation GitHub repository.  
     
-    1. Check that the latest **SentinelOne** package is on the research scada share if not then you can download the last package
+    1. Check that the latest **SentinelOne** package is on the scada share, if not then you can download the last package
        then replace the existing package, see the image below on finding the latest package on the web management console:  
-       ![](./img/sentinels_packages.png)  
+       ![](./img/sentinelone_packages.png)  
     2. Make note and verify the site token for the site that the machine will join, the site token for a site can be found using
        the following image for reference, click the site to find the site token:  
-       ![](./img/settings_sites.png)  
+       ![](./img/sentinelone_settings_sites.png)  
     3. Install the network file system packages if not already installed using the following command:   
        ```shell
        sudo apt install nfs-common -y
@@ -299,7 +313,7 @@ ___
        ```
        The following image will show the NFS shares available, from issuing the above command:  
        ![](./img/nfs_shares_available_on_server.png)   
-       If the NFS share is not available then check the following on the NAS:  
+       If the NFS share is not available, then check the following on the NAS:  
        - Ensure the share folder is created.  
        - Check the location of the share folder.  
        - Check the NFS permission rules.  
@@ -320,13 +334,14 @@ ___
        ```shell
        sudo ./sentinelone_linux_agent_install.sh
        ```
-       **NOTE:** Ensure that the latest packages from step 1, are in the directory and that the shell script 
-       contains the correct path to the latest package and site token (with respect to the site that the machine will join).
+       **NOTE:** Ensure that the latest packages from **Step 23.1** are in the directory and that the shell script 
+       contains the correct path to the latest package and site token
+       (with respect to the site that the machine will join).  
        Use the following command to open the shell script, if necessary:  
        ```shell
        sudo nano sentinelone_linux_agent_install.sh
        ```
     10. Open up the **SentinelOne** web management console and verify the machine joined the Sentinels endpoint list, check the image below:  
-        ![](./img/sentinels_endpoints.png)     
-24. Repeat steps 1–23 above for every MariaDB HAProxy server node created.  
+        ![](./img/sentinelone_endpoints.png)     
+24. Repeat steps 1–23 above for every MariaDB HAProxy server node instance.  
 25. Jump to step 5 in the [MariaDB HAProxy Main Content Steps](#mariadb-haproxy-main-content-steps) section.  

@@ -239,7 +239,7 @@ ___
        ```
        Add the following line to the end of the file:  
        ```text
-       %cansudo All=(ALL:ALL) ALL
+       %cansudo ALL=(ALL:ALL) ALL
        ```
     6. Disable the **smbd** and **winbind** service using the following commands:  
        ```shell

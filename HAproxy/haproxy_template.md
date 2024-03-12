@@ -81,7 +81,7 @@ ___
     ```shell
     sudo apt install haproxy=2.8.\* -y
     ```
-    **NOTE:** If there exist a newer LTS ONLY VERSION past 2.8, then simply replace 2.8 with the latest **LTS** version.  
+    **NOTE:** If there exist a newer LTS ONLY VERSION past 2.8, then replace 2.8 with the latest **LTS** version.  
 12. Install **keepalived** package using the following command:  
     ```shell
     sudo apt install keepalived -y
@@ -134,13 +134,14 @@ ___
             }
     }
     ```
-    **NOTE**: The configuration file will need to be updated and the following parameters will change per MASTER/BACKUP pair:  
+    **NOTE**: The configuration file will need to be updated and the following parameters will change per **MASTER/BACKUP** pair:  
 
-   > **state** - If one node is the MASTER, the other will be the BACKUP.  
-   > **interface** - Check the interface name being used.   
-   > **virtual_router_id** - Use the last octet of the virtual IP address.  
-   > **priority** - If one node is MASTER (101), the other will be the BACKUP (100), higher priority will be the MASTER.   
-   > **virtual_ipaddress** - Check the available IP network reserved for virtual routers.  
+    > **state** - If one node is the **MASTER**, the other will be the **BACKUP**.  
+      **interface** - Check the interface name being used.   
+      **virtual_router_id** - Use the last octet of the virtual IP address.  
+      **priority** - If one node is **MASTER (101)**, the other will be the **BACKUP (100)**,
+      the node with the higher priority value will be the **MASTER**.  
+      **virtual_ip_address** - Check the available IP network reserved for virtual routers.  
 
 14. Create the **keepalived_script** group and user using the following commands:   
     ```shell
@@ -183,7 +184,7 @@ ___
        ```shell
        sudo apt install samba krb5-config krb5-user winbind libnss-winbind libpam-winbind -y 
        ```
-       When prompt for the kerberos default realm type **RESEARCH.PEMO** then highlight over **Ok** and press enter as in the image below:   
+       If prompted for the kerberos default realm type **RESEARCH.PEMO** then highlight over **Ok** and press enter as in the image below:   
        ![](img/default_kerberos_realm.png)
     2. Edit the Kerberos configuration file using the following command:   
         ```shell

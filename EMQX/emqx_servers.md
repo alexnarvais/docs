@@ -5,7 +5,7 @@ ___
     **https://PROXMOX-Server-IP-Address:8006/** 
 2. If a base ubuntu template (**base-ubuntu-template**) is available, then see the 
    [EMQX Server Node Setup ](#emqx-server-node-setup) section, if not continue in **this section** to **step 3**.
-3. If no base Ubuntu template is available, then see the **base-ubuntu build sheet** document. 
+3. If no base Ubuntu template is available, then see the **base-ubuntu** build sheet. 
 4. Create the EMQX HAProxy servers using the **emqx_haproxy** document. 
 
 ## EMQX Server Node Setup 
@@ -98,20 +98,20 @@ ___
    > emq-02 - 10.20.5.18/24 and gateway 10.20.5.1  
    > emq-03 - 10.20.3.18/24 and gateway 10.20.3.1  
    
-8. Restart the machine using the following command:  
-   ```shell
-   sudo reboot
-   ```
-9. Reset the machine ID using the following commands:
+8. Reset the machine ID using the following commands:
    ```shell
    sudo  rm  -f  /etc/machine-id /var/lib/dbus/machine-id
    sudo dbus-uuidgen --ensure=/etc/machine-id
    sudo dbus-uuidgen --ensure
    ```
-10. Regenerate ssh keys using the following commands:
+9. Regenerate ssh keys using the following commands:
+   ```shell
+   sudo rm /etc/ssh/ssh_host_*
+   sudo dpkg-reconfigure openssh-server
+   ```
+10. Restart the machine using the following command:  
     ```shell
-    sudo rm /etc/ssh/ssh_host_*
-    sudo dpkg-reconfigure openssh-server
+    sudo reboot
     ```
 11. Allow incoming connections on the following ports, using the following commands: 
     ```shell
@@ -127,7 +127,8 @@ ___
     ```shell
     sudo ufw status numbered
     ```
-12. Goto any MariaDB server (mdb-01, mdb-02, or mdb-03) and the mqtt database and tables, using the following commands:  
+12. Goto any MariaDB server (mdb-01, mdb-02, or mdb-03) and create the mqtt database and tables.    
+    Issue the following commands:    
     1. Access the MariaDB shell:  
        ```shell 
        sudo mariadb -u root -p
@@ -184,8 +185,8 @@ ___
            ```mariadb
            SELECT * FROM mqtt.mqtt_user;
            ```
-    **NOTE**: Step 12 only has to be executed once, when creating the first EMQX node. 
-              If yes, skip **step 12** and continue to **step 13** below.    
+    **NOTE**: **Step 12** only has to be executed once, when creating the first EMQX node. 
+              If yes, skip **Step 12** and continue to **Step 13** below.    
 13. Install EMQX on Ubuntu using the following commands: 
     1. Download the EMQX repository:  
        ```shell
@@ -199,24 +200,15 @@ ___
        ```shell
        sudo systemctl start emqx
        ```
-    4. Access the EMQX dashboard and reset the default login password by using the domain name or IP address 
+    4. Access the EMQX dashboard with the default login password by using the domain name or IP address 
        of the host where EMQX is being configured, using the url below:  
 
        > **http://EMQX-Server-IP-Address:18083/**  
        
        > default username = admin  
-         default password = public  
-         new password = <one_extra_rich_capital_cat>   
-
-       **NOTE 1**: An alternative way of resetting the password is by using the EMQX command line. There exist some 
-       issues at the current version with some special characters. The command line will accept the special character,
-       but when using the password to access the dashboard, the password is not accepted.   
-       ```shell
-       emqx ctl admins passwd admin <one_extra_rich_capital_cat> 
-       ```
-       **NOTE 2**: Only login with the updated credentials on the first node in the cluster, for the remaining nodes 
-       just verify the EMQX dashboard is accessible. The password only needs to be reset on the first node, once 
-       the remaining nodes join the cluster, the credentials will be propagated to the nodes.  
+         default password = public
+       
+       **NOTE**: Skip the password reset prompt. 
        
 14. Edit the main EMQX broker configuration file using the following command:  
     ```shell 
@@ -280,6 +272,7 @@ ___
       bind = "0.0.0.0:1883"
       enable_authn = quick_deny_anonymous
       proxy_protocol = true
+      proxy_protocol_timeout = "5s"
       max_connections = 1024000
       # max_connections = "infinity"
     }
@@ -300,9 +293,9 @@ ___
       }
     }
     ```
-    **NOTE**: The **node.name** and **mysql.password** should be the only parameters that need to be updated in the
+    **NOTE**: The **node.name** and **authentication.password** should be the only parameters that need to be updated in the
      configuration file for every node instance.  
-15. Restart the **emqx** service and verify the activity status of the node and cluster.
+15. Restart the **emqx** service and verify the activity status.  
     1. Restart the service: 
        ```shell
        sudo systemctl restart emqx
@@ -311,25 +304,50 @@ ___
        ```shell
        sudo systemctl is-active emqx
        ```
-    3. Verify the emqx cluster status using one of two methods:  
-       1. Access the emqx web dashboard and check **Cluster Overview** page using the login credentials from **step 13.4**
-          by entering the following url:   
-          > **http://EMQX-Server-IP-Address:18083/**   
+16. Reset the default password when logging in a second time using one of the following methods:    
+    1. Access the EMQX Web Dashboard using the hostname or IP address of the machine.   
+       See image below for reference:   
+       ![](img/emqx_dashboard_password_change.png)    
+    2. Access the EMQX command utility and enter the following command:  
+       ```shell
+       emqx ctl admins passwd admin <one_extra_rich_capital_cat> 
+       ```
+    3. The password reset will ONLY need to be initiated on first EMQX node created.  
+       Once each node joins the cluster, the updated password will propagate to the node.   
+       The updated password can then can be used to login to the Web Dashboard.     
+    
+    **NOTE:** See below credentials for default username and password with new password:     
+
+    > default username = admin    
+      default password = public  
+      new password = <one_extra_rich_capital_cat>   
+
+17. Verify the EMQX cluster status using one of the following methods    
+    1. Access the EMQX Web Dashboard and check **Cluster Overview** page using the login credentials 
+       from **Step 13.4** by entering the following url:   
+                 
+       > **http://EMQX-Server-IP-Address:18083/**
        
-          The status of the cluster from checking the **Cluster Overview** should look similar to the image below:   
-          ![](img/dashboard_cluster_status.png)  
-       2. Access the emqx command utility and issue the following command from any node in the cluster:  
-          ```shell
-          sudo emqx ctl cluster status
-          ```
-          Output from issuing the command should look similar to the image below:  
-          ![](img/cmd_line_cluster_status.png)   
-16. Join the EMQX server to the Active Directory:  
+       The status of the cluster from checking the **Cluster Overview** should look similar to the image below:   
+       ![](img/emqx_dashboard_cluster_status.png)  
+       
+    2. Access the EMQX command utility and issue the following command from any node in the cluster:  
+       ```shell
+       sudo emqx ctl cluster status
+       ```
+       Output from issuing the command should look similar to the image below:  
+       ![](img/cmd_line_cluster_status.png)   
+    
+18. Verify the connection status to the MariaDB database for client authentication.  
+    See the image below for reference:     
+    ![](img/emqx_dashboard_db_auth.png)    
+
+19. Join the EMQX server to the Active Directory:  
     1. Install the necessary Samba and Kerberos packages to integrate with a Windows OS network using the command below:  
        ```shell
        sudo apt install samba krb5-config krb5-user winbind libnss-winbind libpam-winbind -y 
        ```
-       **NOTE**: When prompt for the kerberos default realm type **RESEARCH.PEMO** then highlight over **Ok** 
+       **NOTE**: If prompted for the kerberos default realm type **RESEARCH.PEMO** then highlight over **Ok** 
        and press enter as in the image below:  
        ![](img/default_kerberos_realm.png)  
     2. Edit the Kerberos configuration file using the **nano** command:   
@@ -380,7 +398,7 @@ ___
        template homedir = /home/%U
        ```
        **NOTE 1**: Comment out any existing variable names that are similar to the names in the new configuration 
-       for the **[global]** section above.
+       for the **[global]** section above.   
        Potential existing variables:  
        
        >  **workgroup**  
@@ -388,8 +406,10 @@ ___
           **log file**  
           **max log size**  
        
-       **NOTE 2**: The **netbios name** parameter should match the instance of the server being created:  
-       `netbios name = EMQ-01 or EMQ-02, or EMQ-03`  
+       **NOTE 2**: The **netbios name** parameter (`netbios name = EMQ-01, EMQ-02, or EMQ-03`)  
+       should be the only changed parameter across each EMQX instance and configuration.   
+       See the image below for reference:    
+       ![](img/samba_server_config_emqx.png)   
     
     5. Edit the name service switch configuration file using the following command:  
        ```shell
@@ -438,17 +458,27 @@ ___
        sudo wbinfo -u
        ```
        **NOTE:** This command will return a list of users from the domain that is connected via **winbind**.   
-
-    10. Verify AD login acceptance into the machine by logging out/in with an AD account.  
-17. Install **SentinelOne** cybersecurity software to detect, protect, and remove malicious software.   
-    > The following sub steps will explain how to install **SentinelOne** by mounting a NAS (network attached storage) 
-      device, then accessing the installation files on the NAS. There are other methods for installation along with uninstalling, 
-      and upgrading **SentinelOne**, if any other method is needed then see the **SentinelOne** setup document 
-      under a PEMO Site Automation GitHub repository.  
+    10. Ensure a user's home directory is created upon their first login, using the following command:  
+        ```shell
+        sudo pam-auth-update --enable mkhomedir
+        ```
+    11. Verify AD login acceptance into the machine by logging out and logging in with an AD account.   
+        Use the following command for reference:  
+        ```shell
+        ssh <user_in_ad_domain>@emq-XX.research.pemo
+        ```
+20. Install **SentinelOne** cybersecurity software.   
     
-    1. Check that the latest **SentinelOne** package is on the research scada share if not then you can download the last package
-       then replace the existing package, see the image below on finding the latest package on the web management console:  
-       ![](./img/sentinelone_packages.png)  
+    > The following sub steps will explain how to install **SentinelOne** by using a NAS (network attached storage) 
+      device, then accessing the installation files on the NAS.  
+    
+    1. Check that the latest **SentinelOne GA Version** is on the **scada** share drive using the following path:  
+       
+       > /Volumes/scada/program_install_files/sentinel_one  
+      
+       See the image below for finding the latest packages using the **SentinelOne Web Management Console**:   
+       ![](./img/sentinelone_packages.png)   
+    
     2. Make note and verify the site token for the site that the machine will join, the site token for a site can be found using
        the following image for reference, click the site to find the site token:  
        ![](./img/sentinelone_settings_sites.png)  
@@ -460,11 +490,7 @@ ___
        ```shell
        sudo mkdir -p /mnt/scada/nas
        ```
-    5. Allow full permissions (read, write, execute) for the owner, group and others using a similar command to the following:  
-       ```shell
-       sudo chmod 777 /mnt/scada/nas
-       ```
-    6. Check that the correct NFS share is available on the NFS server using a similar command to the following:  
+    5. Check that the correct NFS share is available on the NFS server using a similar command to the following:  
        ```shell
        showmount -e cnas-01.research.pemo
        ```
@@ -475,29 +501,32 @@ ___
        - Check the location of the share folder.  
        - Check the NFS permission rules.
 
-    7. Mount the external NFS share on machine using a similar command to the following:  
+    6. Mount the external NFS share on machine using a similar command to the following:  
        ```shell
-       sudo mount -t nfs cnas-01.research.pemo:/volume1/scada /mnt/scada/nas
+       sudo mount -t nfs cnas-01.research.pemo:/volume2/scada /mnt/scada/nas
+       ```
+    7. Allow full permissions (read, write, execute) for the owner, group and others using a similar command to the following:  
+       ```shell
+       sudo chmod 777 /mnt/scada/nas
        ```
     8. Change directories to the location where the files and shell script are located using a similar command to the following:  
        ```shell
        cd /mnt/scada/nas/program_install_files/sentinel_one
        ```
-       **NOTE:** If denied access to the NFS share then change owner of the directory using a similar command to the following:  
-       ```shell
-       sudo chown <user or user:group> /mnt/scada/nas
-       ```
     9. Once in the **SentinelOne** directory execute the shell script **sentinelone_linux_agent_install.sh** using the following command:  
        ```shell
        sudo ./sentinelone_linux_agent_install.sh
        ```
-       **NOTE:** Ensure that the latest packages from step 17.1, are in the directory and that the shell script 
-       contains the correct path to the latest package and site token (with respect to the site that the machine will join).
+       **NOTE:** Ensure that the latest packages from **Step 17.1** are in the directory and that the shell script 
+       contains the correct path to the latest package and site token (with respect to the site that the machine will join).  
        Use the following command to open the shell script, if necessary:  
        ```shell
        sudo nano sentinelone_linux_agent_install.sh
        ```
     10. Open up the **SentinelOne** web management console and verify the machine joined the Sentinels endpoint list, check the image below:  
         ![](./img/sentinelone_endpoints.png)  
-18. Repeat steps 1–17 above, for every EMQX node created.  
-19. Jump to step 4 in the [EMQX Server Node Main Content Setup](#emqx-server-node-main-content-steps) section.  
+21. Shutdown the VM and remove all **CD/DVD Drives**, see the following image for reference:
+    ![](./img/vm_remove_hardware_cd-dvd-drive.png)  
+22. Start the VM.
+23. Repeat **Steps 1–22** above, for every EMQX node created.  
+24. Jump to **Step 4** in the [EMQX Server Node Main Content Setup](#emqx-server-node-main-content-steps) section.  

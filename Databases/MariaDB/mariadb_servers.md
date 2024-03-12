@@ -1,4 +1,5 @@
 # MariaDB Server Node Main Content Steps
+The following virtual machine(s) will be created using the PROXMOX Hypervisor Type 1 Software.   
 ___
 1. Access the PROXMOX Hypervisor web interface using a web browser and enter the following url in the specified format:  
     **https://Your-Servers-IP-Address:8006/** 
@@ -219,19 +220,26 @@ ___
        ```
        **NOTE:** This command will return a list of users from the domain that is connected via **winbind**.   
 
-    5. Verify AD login acceptance into the machine by logging out and in with your AD account.  
-21. Install **SentinelOne** cybersecurity software to detect, protect, and remove malicious software.   
-    > The following sub steps will explain how to install **SentinelOne** by mounting a NAS (network attached storage) 
-      device, then accessing the installation files on the NAS. There are other methods for installation along with uninstalling, 
-      and upgrading **SentinelOne**, if any other method is needed, then see the **SentinelOne** setup document
-      under a PEMO Site Automation GitHub repository.  
+    5. Verify AD login acceptance into the machine by logging out and logging in with an AD account.   
+       Use the following command for reference:  
+       ```shell
+       ssh <user_in_ad_domain>@mdb-XX.research.pemo
+       ```
+21. Install **SentinelOne** cybersecurity software.   
+
+    > The following sub steps will explain how to install **SentinelOne** by using a NAS (network attached storage) 
+      device, then accessing the installation files on the NAS.  
     
-    1. Check that the latest **SentinelOne** package is on the scada share, if not then you can download the last package
-       then replace the existing package, see the image below on finding the latest package on the web management console:  
-       ![](./img/sentinelone_packages.png)  
+    1. Check that the latest **SentinelOne GA Version** is on the **scada** share drive using the following path:   
+       
+       > /Volumes/scada/program_install_files/sentinel_one  
+      
+       See the image below for finding the latest packages using the **SentinelOne Web Management Console**:   
+       ![](./img/sentinelone_packages.png)   
+    
     2. Make note and verify the site token for the site that the machine will join, the site token for a site can be found using
        the following image for reference, click the site to find the site token:  
-       ![](./img/sentinelone_settings_sites.png)  
+       ![](./img/sentinelone_settings_sites.png)   
     3. Install the network file system packages if not already installed using the following command:   
        ```shell
        sudo apt install nfs-common -y
@@ -240,11 +248,7 @@ ___
        ```shell
        sudo mkdir -p /mnt/scada/nas
        ```
-    5. Allow full permissions (read, write, execute) for the owner, group and others using a similar command to the following:  
-       ```shell
-       sudo chmod 777 /mnt/scada/nas
-       ```
-    6. Check that the correct NFS share is available on the NFS server using a similar command to the following:  
+    5. Check that the correct NFS share is available on the NFS server using a similar command to the following:  
        ```shell
        showmount -e cnas-01.research.pemo
        ```
@@ -255,17 +259,17 @@ ___
        2. Check the location of the share folder.
        3. Check the NFS permission rules.
 
-    7. Mount the external NFS share on machine using a similar command to the following:  
+    6. Mount the external NFS share on machine using a similar command to the following:  
        ```shell
        sudo mount -t nfs cnas-01.research.pemo:/volume1/scada /mnt/scada/nas
+       ```
+    7. Allow full permissions (read, write, execute) for the owner, group and others using a similar command to the following:  
+       ```shell
+       sudo chmod 777 /mnt/scada/nas
        ```
     8. Change directories to the location where the files and shell script are located using a similar command to the following:  
        ```shell
        cd /mnt/scada/nas/program_install_files/sentinel_one
-       ```
-       **NOTE:** If denied access to the NFS share then change owner of the directory using a similar command to the following:  
-       ```shell
-       sudo chown <user or user:group> /mnt/scada/nas
        ```
     9. Once in the **SentinelOne** directory execute the shell script **sentinelone_linux_agent_install.sh** using the following command:  
        ```shell
@@ -500,8 +504,8 @@ ___
    ```shell
    sudo systemctl restart cron
    ```
-9. Jump to step 7 in the [MariaDB Server Node Main Content Setup](#mariadb-server-node-main-content-steps) section.  
+9. Jump to **Step 7** in the [MariaDB Server Node Main Content Setup](#mariadb-server-node-main-content-steps) section.  
 
 ## MariaDB Backup Node Setup
 ___
-1. Jump to step 8 in the [MariaDB Server Node Main Content Setup](#mariadb-server-node-main-content-steps) section.
+1. Jump to **Step 8** in the [MariaDB Server Node Main Content Setup](#mariadb-server-node-main-content-steps) section.

@@ -1,4 +1,5 @@
 # MariaDB Virtual Machine Template Setup
+The following virtual machine(s) will be created using the PROXMOX Hypervisor Type 1 Software.   
 Create the MariaDB VM template on **pm-01** node and then migrate the template to the other nodes 
 in the cluster. 
 

@@ -1,4 +1,5 @@
 # MariaDB HAProxy Main Content Steps
+The following virtual machine(s) will be created using the PROXMOX Hypervisor Type 1 Software.   
 Ensure that there exists a functional MariaDB Galera Cluster before creating the HAProxy Load Balancers.
 HAProxy is a software package that can be installed on Linux flavored operating systems which in turn allows 
 the OS to act as a reverse proxy and load balancer. 
@@ -108,21 +109,23 @@ ___
     ![](img/vm_nic_vlan_tag.png)   
     **NOTE:** If prompted to select which daemon services should be restarted, then accept the default selections, 
     press the **tab** key to navigate between the selections.
-13. Setup the firewall rules to allow incoming traffic from the following types of traffic:  
-    **MariaDB database:**
-    ```shell
-    sudo ufw allow 3306/tcp
-    ```
-    If HAProxy is being setup on **mdbh-01**, then allow traffic from **mdbh-02
-    (10.20.20.13)** using the following command:   
-    ```shell
-    sudo ufw allow from 10.20.20.13
-    ```
-    If HAProxy is being setup on **mdbh-02**, then allow traffic from **mdbh-01
-    (10.20.20.12)** using the following command:   
-    ```shell
-    sudo ufw allow from 10.20.20.12
-    ```
+13. Allow incoming connections on the following ports, using the following commands:  
+    1. **MariaDB database:**
+       ```shell
+       sudo ufw allow 3306/tcp
+       ```
+    2. On **mdbh-01**, allow traffic from **mdbh-02 (10.20.20.13)** using the following command:  
+       ```shell
+       sudo ufw allow from 10.20.20.13
+       ```
+    3. On **mdbh-02**, allow traffic from **mdbh-01 (10.20.20.12)** using the following command:
+       ```shell
+       sudo ufw allow from 10.20.20.12
+       ```
+    4. Verify the firewall rules were accepted using the following command:  
+       ```shell
+       sudo ufw status numbered
+       ```
 14. Update the **keepalived** file for load balancing and high-availability using the following command:  
     ```shell
     sudo nano /etc/keepalived/keepalived.conf
@@ -133,11 +136,12 @@ ___
     **NOTE**: The configuration file will need to be updated and the following parameters 
     will change per **MASTER/BACKUP** pair:   
 
-    > **state** - If one node is the MASTER, the other will be the BACKUP.  
+    > **state** - If one node is the **MASTER**, the other will be the **BACKUP**.  
       **interface** - Check the interface name being used.   
       **virtual_router_id** - Use the last octet of the virtual IP address.  
-      **priority** - If one node is MASTER (101), the other will be the BACKUP (100), higher priority will be the MASTER.  
-      **virtual_ipaddress** - Check the available IP network reserved for virtual routers.  
+      **priority** - If one node is **MASTER (101)**, the other will be the **BACKUP (100)**,
+      the node with the higher priority value will be the **MASTER**.  
+      **virtual_ip_address** - Check the available IP network reserved for virtual routers.  
    
 15. Update the **haproxy** file for load balancing and high-availability using the following command:   
     ```shell
@@ -232,20 +236,22 @@ ___
     ```shell
     sudo systemctl is-active haproxy
     ```
-18. You can verify the state of each Keepalived service by examining the Keepalived logs on each MariaDB HAProxy node:  
+18. You can verify the state of each Keepalived service by examining the Keepalived logs on each EMQX HAProxy node:  
     ```shell
     sudo grep "Keepalived" /var/log/syslog
     ```
     **NOTE:** This command will go through the 'syslog' file, line by line, and print out any lines that contain 
-    the word "Keepalived".  
+    the word "Keepalived".     
+    See the image below for reference:   
+    ![](img/keepalived_logs.png)  
 19. Open a web browser and type the url [http://10.20.20.11:8404/stats](http://10.20.20.11:8404/stats)
     to access the HAProxy stats web page.  
-    If all the EMQX and HAproxy servers are operating correctly,
+    If all the MariaDB and HAproxy servers are operating correctly,
     then frontend, backend and listen tables will be displayed, where each row corresponds to a server and 
     the color green indicates the server is active and up.  
     A legend is displayed that'll the row color scheme, see the image below:     
     ![](img/mariadb_haproxy_stats_page.png)  
-20. Access AD-01 and bind the virtual IP to the hostname **emq.research.pemo** using the following steps:  
+20. Access AD-01 and bind the virtual IP to the hostname **mdb.research.pemo** using the following steps:  
     1. Open the **DNS** tools from the **Microsoft Server Manager**, see the image below:   
        ![](img/dns_tools_server_manager.png)  
     2. Create a new host in the **research.pemo** domain under the **Foward Lookup Zones**, see the image below:  
@@ -271,7 +277,7 @@ ___
        ```shell
        sudo net ads join -S AD-01.RESEARCH.PEMO -U <user_in_ad_domain>
        ```
-       **<user_in_ad_domain>** - is a user who has privileges in the AD domain to add a computer.  
+       **NOTE:** **<user_in_ad_domain>** is a user who has privileges in the AD domain to add a computer.  
     4. Start and enable the **winbind** service using the following command:  
        ```shell
        sudo systemctl enable --now winbind
@@ -282,16 +288,23 @@ ___
        ```
        **NOTE:** This command will return a list of users from the domain that is connected via **winbind**.  
 
-    5. Verify AD login acceptance into the machine by logging out/in with your AD account. 
-23. Install **SentinelOne** cybersecurity software to detect, protect, and remove malicious software.   
-    > The following sub steps will explain how to install **SentinelOne** by mounting a NAS (network attached storage) 
-      device, then accessing the installation files on the NAS. There are other methods for installation along with uninstalling, 
-      and upgrading **SentinelOne**, if any other method is needed, then see the **SentinelOne** setup document
-      under a PEMO Site Automation GitHub repository.  
+    5. Verify AD login acceptance into the machine by logging out and logging in with an AD account.   
+       Use the following command for reference:  
+       ```shell
+       ssh <user_in_ad_domain>@mdbh-XX.research.pemo
+       ```
+23. Install **SentinelOne** cybersecurity software.   
+
+    > The following sub steps will explain how to install **SentinelOne** by using a NAS (network attached storage) 
+      device, then accessing the installation files on the NAS.  
     
-    1. Check that the latest **SentinelOne** package is on the scada share, if not then you can download the last package
-       then replace the existing package, see the image below on finding the latest package on the web management console:  
-       ![](./img/sentinelone_packages.png)  
+    1. Check that the latest **SentinelOne GA Version** is on the **scada** share drive using the following path:  
+       
+       > /Volumes/scada/program_install_files/sentinel_one  
+      
+       See the image below for finding the latest packages using the **SentinelOne Web Management Console**:   
+       ![](./img/sentinelone_packages.png)   
+    
     2. Make note and verify the site token for the site that the machine will join, the site token for a site can be found using
        the following image for reference, click the site to find the site token:  
        ![](./img/sentinelone_settings_sites.png)  
@@ -303,11 +316,7 @@ ___
        ```shell
        sudo mkdir -p /mnt/scada/nas
        ```
-    5. Allow full permissions (read, write, execute) for the owner, group and others using a similar command to the following:  
-       ```shell
-       sudo chmod 777 /mnt/scada/nas
-       ```
-    6. Check that the correct NFS share is available on the NFS server using a similar command to the following:  
+    5. Check that the correct NFS share is available on the NFS server using a similar command to the following:  
        ```shell
        showmount -e cnas-01.research.pemo
        ```
@@ -318,17 +327,17 @@ ___
        - Check the location of the share folder.  
        - Check the NFS permission rules.  
 
-    7. Mount the external NFS share on machine using a similar command to the following:  
+    6. Mount the external NFS share on machine using a similar command to the following:  
        ```shell
        sudo mount -t nfs cnas-01.research.pemo:/volume1/scada /mnt/scada/nas
+       ```
+    7. Allow full permissions (read, write, execute) for the owner, group and others using a similar command to the following:  
+       ```shell
+       sudo chmod 777 /mnt/scada/nas
        ```
     8. Change directories to the location where the files and shell script are located using a similar command to the following:  
        ```shell
        cd /mnt/scada/nas/program_install_files/sentinel_one
-       ```
-       **NOTE:** If denied access to the NFS share then change owner of the directory using a similar command to the following:  
-       ```shell
-       sudo chown <user or user:group> /mnt/scada/nas
        ```
     9. Once in the **SentinelOne** directory execute the shell script **sentinelone_linux_agent_install.sh** using the following command:  
        ```shell
@@ -336,7 +345,7 @@ ___
        ```
        **NOTE:** Ensure that the latest packages from **Step 23.1** are in the directory and that the shell script 
        contains the correct path to the latest package and site token
-       (with respect to the site that the machine will join).  
+       (with respect to the site that the machine will join).   
        Use the following command to open the shell script, if necessary:  
        ```shell
        sudo nano sentinelone_linux_agent_install.sh

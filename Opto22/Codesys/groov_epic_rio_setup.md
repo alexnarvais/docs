@@ -7,7 +7,7 @@ ___
 3. [CODESYS IGNITION OPU UA Client/Server Setup](#codesys-ignition-opu-ua-clientserver-setup)
 4. [MQTT Sparkplug Configuration](#mqtt-sparkplug-configuration)  
 5. [Configuring Secure Shell Access](#configuring-secure-shell-access)
-___  
+
 ## GROOV Manage Setup
 1. Open a web browser and acess the **GROOV RIO/EPIC** by one of the following methods:  
    1. If the network that the device is connected to uses DHCP then access the device by the DHCP leased IP address
@@ -17,7 +17,7 @@ ___
      
       https://www.opto22.com/support/resources-tools/downloads/groovfind-exe  
 
-2. Navigate the to **Network** page and update the network configuration.  
+2. Navigate to the **Network** page and update the network configuration.  
    1. Path to configure network settings:  
          > Network/Configure
    2. Make the hostname in the following format:  
@@ -29,7 +29,7 @@ ___
    
    See the image below for reference:    
    ![](img/groov_manage_network_page.png)      
-3. Create a new DNS record for the GROOV EPIC/RIO by accessing ad-01 using the following steps:  
+3. Create a new DNS record for the GROOV EPIC/RIO by accessing ad-01, using the following sub-steps:  
    1. Open the DNS tools from Microsoft Server Manager, see the image below:  
       ![](img/dns_tools_server_manager.png)  
    2. Create a new host in the **research.pemo** domain under the **Forward Lookup Zones**, see the image below:  
@@ -38,13 +38,13 @@ ___
       ![](img/new_host_in_domain.png)   
    4. Open a web browser and verify that the device can be accessed by the new hostname, see the image below for reference:   
       ![](img/device_access_by_hostname.png)   
-4. Navigate to the **Time** page and update the time setting.
+4. Navigate to the **Time** page and update the time settings.
    1. Path to configure time settings:   
          > System/Time  
    2. Set the Time Servers and Time Zone accordingly, see image below for reference:    
       ![](img/groov_manage_time_page.png)       
 5. Back to [Main Content](#main-content)
-___
+
 ## GROOV RIO/EPIC Setup In CODESYS
 1. Download the Opto 22 Library Package for CODESYS Development System 
    if not already installed using the following link:  
@@ -110,7 +110,7 @@ ___
       See the image below for reference:  
       ![](img/download_program_to_device.png)      
 9. Back to [Main Content](#main-content)  
-___
+
 ## CODESYS IGNITION OPU UA Client/Server Setup
 The Symbol Configuration object will be added to the CODESYS project to expose tags to the CODESYS OPC UA Server and
 allow Ignitions OPC UA Client to connect and read/write tags.   
@@ -200,7 +200,6 @@ Perform the following to add a **Symbol Configuration** object in the offline mo
       See the image below for reference:    
       ![](img/ignition_opc_client_connect.png)  
 9. Back to [Main Content](#main-content)
-___
 
 ## MQTT Sparkplug Configuration
 1. Configure a MQTT client by accessing the **Data Service** page from **GROOV Manage** and selecting **Configure** 
@@ -234,7 +233,6 @@ ___
    See the image below for reference:     
    ![](img/mqtt_broker_client_page.png)   
 5. Back to [Main Content](#main-content)
-___
 
 ## Configuring Secure Shell Access
 1. Purchase a shell license using the following link:  

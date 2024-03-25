@@ -77,18 +77,18 @@ ___
    sudo dpkg-reconfigure openssh-server
    ```
 10. Change the network interface IP address from DHCP to Static by editing the **00-installer-config.yaml** file using the following command:   
-     ```shell
-     sudo nano /etc/netplan/00-installer-config.yaml
-     ```
+    ```shell
+    sudo nano /etc/netplan/00-installer-config.yaml
+    ```
     Under the network interface key comment out the **dhcp4** key:value pair and then uncomment the remaining lines
     and set the network settings accordingly.  
     See the image below for reference:    
     ![](img/netplan_config_static_ip.png)  
     **NOTE:** IP Address per node server should fall within the following subnets:
-   
+
     > mdb-01 - 10.20.1.14/24 and gateway 10.20.1.1  
-    > mdb-02 - 10.20.5.14/24 and gateway 10.20.5.1  
-    > mdb-03 - 10.20.3.14/24 and gateway 10.20.3.1  
+      mdb-02 - 10.20.5.14/24 and gateway 10.20.5.1  
+      mdb-03 - 10.20.3.14/24 and gateway 10.20.3.1  
    
 11. Restart the machine using the following command:  
     ```shell

@@ -5,7 +5,8 @@ ___
 1. [GROOV Manage Setup](#groov-manage-setup)
 2. [GROOV RIO/EPIC Setup In CODESYS](#groov-rioepic-setup-in-codesys)
 3. [CODESYS IGNITION OPU UA Client/Server Setup](#codesys-ignition-opu-ua-clientserver-setup)
-4. [Configuring Secure Shell Access](#configuring-secure-shell-access)  
+4. [Configuring Secure Shell Access](#configuring-secure-shell-access)   
+5. [MQTT Sparkplug Configuration](#mqtt-sparkplug-configuration)  
 ___  
 ## GROOV Manage Setup
 1. Open a web browser and acess the **GROOV RIO/EPIC** by one of the following methods:  
@@ -22,18 +23,27 @@ ___
    2. Make the hostname in the following format:  
          > grv-<rio_OR_epic>-<IP_Octet3><IP_Octet4>  
         EX1: If device is RIO with IP address 192.168.1.5 then `hostname = grv-rio-0105`  
-        EX2: If device is EPIC with IP address 192.168.111.555 then `hostname = grv-epic-111555` 
+        EX2: If device is EPIC with IP address 192.168.111.222 then `hostname = grv-epic-111222` 
          
-   **NOTE:** Use two digit precision minimum for each IP Octet.  
+   **NOTE:** Use two digit precision minimum when appending each IP Octet to the hostname.  
    
    See the image below for reference:    
    ![](img/groov_manage_network_page.png)      
-3. Navigate the to **Time** page and update the time setting.
+3. Create a new DNS record for the GROOV EPIC/RIO by accessing ad-01 using the following steps:  
+   1. Open the DNS tools from Microsoft Server Manager, see the image below:  
+      ![](img/dns_tools_server_manager.png)  
+   2. Create a new host in the **research.pemo** domain under the **Foward Lookup Zones**, see the image below:  
+      ![](img/research_domain_lookup.png)  
+   3. Bind a new hostname to the device IP, see the image below:  
+      ![](img/new_host_in_domain.png)   
+   4. Open a web browser and verify that the device can be accessed by the new hostname, see the image below for reference:   
+      ![](img/device_access_by_hostname.png)   
+4. Navigate the to **Time** page and update the time setting.
    1. Path to configure time settings:   
          > System/Time  
    2. Set the Time Servers and Time Zone accordingly, see image below for reference:    
       ![](img/groov_manage_time_page.png)       
-4. Back to [Main Content](#main-content)
+5. Back to [Main Content](#main-content)
 ___
 ## GROOV RIO/EPIC Setup In CODESYS
 1. Create a New Standard Project from the Codesys IDE.   
@@ -54,8 +64,8 @@ ___
       ![](img/add_ethernet_adapter.png)  
    3. Add a device to the Ethernet adapter.  
       ![](img/add_ethernet_adapter_device.png)   
-   4. Add the GROOV EPIC/RIO as the device. 
-      ![](img/ethernet_adapter_device_type.png)
+   4. Add the GROOV EPIC/RIO as the device.   
+      ![](img/ethernet_adapter_device_type.png)   
 5. Configure the I/O on GROOV EPIC/RIO using the **Devices View (device tree)**:  
    1. Plug a device for each empty slot of the GROOV EPIC/RIO by right-clicking on the device and selecting **Plug Device**.  
    ![](img/plug_device.png)  
@@ -185,6 +195,41 @@ Perform the following to add a **Symbol Configuration** object in the offline mo
       ![](img/ignition_opc_client_connect.png)  
 9. Back to [Main Content](#main-content)
 ___
+
+## MQTT Sparkplug Configuration
+1. Configure a MQTT client by accessing the **Data Service** page from **GROOV Manage** and selecting **Configure** 
+   in the upper right-hand corner.  
+   See the image below for reference on the **Data Service Configuration** page:   
+   ![](img/data_service_configuration.png)  
+2. Select **Add MQTT Sparkplug** from the **Data Service** page and set the following:  
+   1. **Enable** = **True**
+   2. **Group ID** = the area where the device will be located (Conner_A, Plant_2, Aspex, PD, Etc.)
+   3. **Edge Node ID** = **GRV-<RIO_or_EPIC>-<IP_Octet3><IP_Octet4>**
+   4. **Allow Writes** = **True** if necessary otherwise leave **False**.
+   5. Select **Add MQTT Broker** and set the following:  
+      1. **Broker Address** = hostname of mqtt broker such as **emqx.research.pemo:1883**
+      2. **Client ID** = **grv-<rio_or_epic>-<IP_Octet3><IP_Octet4>**  
+      3. Enter a valid username and password to access the MQTT broker.  
+         See the image below for reference on the setting up the MQTT Broker:  
+         ![](img/mqtt_broker_setup.png)   
+   6. Leave the remaining parameters at the defaults.    
+   7. Click **Save** in the upper right-hand corner.  
+   See the image below for reference on setting-up MQTT Sparkplug:   
+   ![](img/mqtt_sparkplug_setup.png)   
+3. Select **Add Local I/O System** from the **Data Service** page and set the following:  
+   1. **Enable** = **True**
+   2. **Device ID** = **GRV_<RIO_or_EPIC>_<IP_Octet3><IP_Octet4>_MQTT** 
+   3. **MQTT Sparkplug** = **True**
+   4. Leave the remaining parameters at the defaults.   
+   5. Click **Save** in the upper right-hand corner.    
+   See the image below for reference on setting-up the **Device Local I/O System**:     
+   ![](img/mqtt_scanned_devices.png)   
+4. Access the **MQTT Broker** used in **Step 2.v.a** and verify the device made a connection to the **MQTT Broker**.   
+   See the image below for reference:     
+   ![](img/mqtt_broker_client_page.png)   
+5. Back to [Main Content](#main-content)
+___
+
 ## Configuring Secure Shell Access
 1. Purchase a shell license using the following link:  
    https://www.opto22.com/products/product-selector?c1=32&c2=34
@@ -223,5 +268,4 @@ ___
       > ssh automation@<IPV4_Address or Hostname>
       
       **NOTE:** After initial connection a prompt will appear asking for the password.  
-7. Back to [Main Content](#main-content) 
-___
+7. Back to [Main Content](#main-content)

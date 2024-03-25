@@ -252,12 +252,12 @@ ___
     A legend is displayed that'll the row color scheme, see the image below:     
     ![](img/mariadb_haproxy_stats_page.png)  
 20. Access AD-01 and bind the virtual IP to the hostname **mdb.research.pemo** using the following steps:  
-    1. Open the **DNS** tools from the **Microsoft Server Manager**, see the image below:   
+    1. Open the **DNS** tools from **Microsoft Server Manager**, see the image below:   
        ![](img/dns_tools_server_manager.png)  
     2. Create a new host in the **research.pemo** domain under the **Foward Lookup Zones**, see the image below:  
-       ![](img/research_domain_in_ad.png)
+       ![](img/research_domain_lookup.png)
     3. Bind a new hostname to the virtual IP, see the image below:  
-       ![](img/new_host_in_research_domain.png)  
+       ![](img/new_host_in_domain.png)  
 21. Open a web browser and type the url [http://mdb.research.pemo:8404/stats](http://mdb.research.pemo:8404/stats)
     to verify the binding of the new hostname and virtual IP.  
 22. Join the MariaDB HAProxy server to the Active Directory:  

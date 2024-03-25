@@ -12,7 +12,7 @@ ___
 1. Open a web browser and acess the **GROOV RIO/EPIC** by one of the following methods:  
    1. If the network that the device is connected to uses DHCP then access the device by the DHCP leased IP address
       or the default hostname that's listed on the information label of the device.  
-   2. If the network doesn't use DHCP then install the **groov Find** application to find the device and assign it
+   2. If the network doesn't use DHCP then install the **GROOV Find** application to find the device and assign it
       a static IP address, using the following link:
      
       https://www.opto22.com/support/resources-tools/downloads/groovfind-exe  
@@ -32,7 +32,7 @@ ___
 3. Create a new DNS record for the GROOV EPIC/RIO by accessing ad-01 using the following steps:  
    1. Open the DNS tools from Microsoft Server Manager, see the image below:  
       ![](img/dns_tools_server_manager.png)  
-   2. Create a new host in the **research.pemo** domain under the **Foward Lookup Zones**, see the image below:  
+   2. Create a new host in the **research.pemo** domain under the **Forward Lookup Zones**, see the image below:  
       ![](img/research_domain_lookup.png)  
    3. Bind a new hostname to the device IP, see the image below:  
       ![](img/new_host_in_domain.png)   
@@ -46,18 +46,24 @@ ___
 5. Back to [Main Content](#main-content)
 ___
 ## GROOV RIO/EPIC Setup In CODESYS
-1. Create a New Standard Project from the Codesys IDE.   
+1. Download the Opto 22 Library Package for CODESYS Development System 
+   if not already installed using the following link:  
+   https://www.opto22.com/support/resources-tools/downloads/opto-22-library-package-for-codesys-development-sy  
+   **NOTE:** Open the **CODESYS Installer** and click **Change** on the **CODESYS** Version being used,
+   then under the **Installed** tab find the **Opto22 Package**.   
+   See the image below for reference:    
+   ![](img/opto22_package_codesys.png)  
+2. Create a New Standard Project from the Codesys IDE.   
    ![](img/standard_project.png)  
-
-2. Select a programmable device and the program language for the default Main Task.  
-   ![](img/device_and_program_task.png)  
-3. Copy the **Composite Types** folder to the **Application View** that contains all the custom DUTs (Data Unit Type) 
+3. Select a programmable device and the program language for the default Main Task.  
+   ![](img/device_and_program_task.png)   
+4. Copy the **Composite Types** folder to the **Application View** that contains all the custom DUTs (Data Unit Type) 
    and POUs (Program Organization Unit).
    The **Composite Types** folder can be copied from another project or from the NAS,
    ensure that the folder has the latest DUTs and POUs before copying.  
    See the image below for reference:  
    ![](img/composite_types_folder.png)   
-4. Add an Ethernet Adapter using the **Devices View (device tree)**:  
+5. Add an Ethernet Adapter using the **Devices View (device tree)**:  
    1. Right-Click and add the device.  
       ![](img/add_device.png)   
    2. Select **All vendors** from the Vendor dropdown and add an **Ethernet Adapter**.  
@@ -66,12 +72,12 @@ ___
       ![](img/add_ethernet_adapter_device.png)   
    4. Add the GROOV EPIC/RIO as the device.   
       ![](img/ethernet_adapter_device_type.png)   
-5. Configure the I/O on GROOV EPIC/RIO using the **Devices View (device tree)**:  
+6. Configure the I/O on GROOV EPIC/RIO using the **Devices View (device tree)**:  
    1. Plug a device for each empty slot of the GROOV EPIC/RIO by right-clicking on the device and selecting **Plug Device**.  
    ![](img/plug_device.png)  
    2. Select the signal type or IO module for each empty slot that's being plugged.  
    ![](img/plug_device_signal_type.png) 
-6. License the Codesys Runtime Engine on the EPIC/RIO
+7. License the Codesys Runtime Engine on the EPIC/RIO
    1. Purchase a license using the following link:  
       https://www.opto22.com/products/product-selector?c1=32&c2=34
    2. After purchasing the license, activate the license to retrieve a Codesys Ticket ID using the following link:  
@@ -89,21 +95,21 @@ ___
       ![](img/install_license_ticket_id.png)   
    8. Verify that the runtime was licensed by checking the **Device Log**, see image below for reference:  
       ![](img/codesys_runtime_licensed.png)     
-7. Follow the sub steps below to download a working program to the device.
+8. Follow the sub steps below to download a working program to the device.
    1. Compile the code to check for errors by using the **Generate Code** tool from the **Build Tab**. 
    2. Select the **Communication Settings** section from the **Device View Page** and add a device to the **Gateway** 
       by scanning the network with the **Scan Network** button or manually entering the IP address of the device 
       and pressing **enter**.  
       See the image below for reference:    
       ![](img/device_communication_settings.png)    
-   3. Select the **Ethernet Adapter** that was added from **Step 4** and set the network interface to the local host 
+   3. Select the **Ethernet Adapter** that was added from **Step 5** and set the network interface to the **Local Host** 
       by using the **Browse** button.   
       See the image below for reference:  
       ![](img/ethernet_adpater_network_interface.png)     
    4. Select **Login** from the **Online Tab** to login and download to the device.  
       See the image below for reference:  
       ![](img/download_program_to_device.png)      
-8. Back to [Main Content](#main-content)  
+9. Back to [Main Content](#main-content)  
 ___
 ## CODESYS IGNITION OPU UA Client/Server Setup
 The Symbol Configuration object will be added to the CODESYS project to expose tags to the CODESYS OPC UA Server and
@@ -186,7 +192,7 @@ Perform the following to add a **Symbol Configuration** object in the offline mo
 
       See the image below for reference:    
       ![](img/codesys_quarantined_certificates.png)     
-   **NOTE:** If there exist an **Ignition MASTER/BACKUP pair**, then goto each gateway and **Trust** the certificate.  
+   **NOTE:** If there exist an **Ignition MASTER/BACKUP Pair**, then goto each gateway and **Trust** the certificate.  
    2. Verify the OPC client connection was established to the CODESYS OPC UA Server, using the following path:  
     
       > Config/OPC Client/OPC Connections  

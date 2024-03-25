@@ -5,8 +5,8 @@ ___
 1. [GROOV Manage Setup](#groov-manage-setup)
 2. [GROOV RIO/EPIC Setup In CODESYS](#groov-rioepic-setup-in-codesys)
 3. [CODESYS IGNITION OPU UA Client/Server Setup](#codesys-ignition-opu-ua-clientserver-setup)
-4. [Configuring Secure Shell Access](#configuring-secure-shell-access)   
-5. [MQTT Sparkplug Configuration](#mqtt-sparkplug-configuration)  
+4. [MQTT Sparkplug Configuration](#mqtt-sparkplug-configuration)  
+5. [Configuring Secure Shell Access](#configuring-secure-shell-access)
 ___  
 ## GROOV Manage Setup
 1. Open a web browser and acess the **GROOV RIO/EPIC** by one of the following methods:  

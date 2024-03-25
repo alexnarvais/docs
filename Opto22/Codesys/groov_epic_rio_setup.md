@@ -38,7 +38,7 @@ ___
       ![](img/new_host_in_domain.png)   
    4. Open a web browser and verify that the device can be accessed by the new hostname, see the image below for reference:   
       ![](img/device_access_by_hostname.png)   
-4. Navigate the to **Time** page and update the time setting.
+4. Navigate to the **Time** page and update the time setting.
    1. Path to configure time settings:   
          > System/Time  
    2. Set the Time Servers and Time Zone accordingly, see image below for reference:    

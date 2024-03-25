@@ -8,7 +8,7 @@ ___
 > > **Associates of Arts: Business/Accounting | South Plains College | Lubbock, TX | Aug. 1990**
 
 > **EMPLOYMENT**  
-> > **Administrative Assistant | Snatched Body Contouring | Lubbock, TX | Oct. 2021—Present**  
+> > **Administrative Assistant | Snatched Body Contouring | Lubbock, TX | Mar. 2020—Present**  
 > * Office management which includes scheduling appointments, managing patient records, and handling correspondence.   
 > * Proficient in Microsoft Office, Excel, and PowerPoint to handle the following:   
 >   * Patient Data (contact details, appointment dates, and treatment plans).
@@ -21,7 +21,16 @@ ___
 is tied to self-image, and it’s important to be understanding and kind.
 > * Knowledge of healthcare privacy laws (HIPAA) to protect patient privacy.
 > 
-> > **Assistant Manager | A&J Collision Tech | Lubbock, TX | Jun. 2016—Oct. 2021**
+> > **Collection Agent | Perdue Brandon Fielder Collins & Mott, LLP | Lubbock, TX | Jun. 2019—Mar. 2020**
+> * Handled high volume inbound and outbound phone calls.
+> * Debt recovery for unpaid debts from clients who have defaulted on payment.
+> * Progress reports on steps taken and plans to recover client debts. 
+> * Negotiating settlements in setting up payment plans or lump-sum payments. 
+> * Maintaining records with accurate up-to-date records of interaction with debtors, payments received, and arrangements 
+> made. 
+> * Enforce legal actions under the guidance of the law firm in starting legal proceedings to recover debts.
+>
+> > **Assistant Manager | A&J Collision Tech | Lubbock, TX | Apr. 2014—Jun. 2019**
 > * Supervision in delegating tasks, tracking task progress, and meeting completion dates with teams. 
 > * Generated proper customer service in interacting with customers, handling their concerns, providing 
 clear explanations of repairs, and meeting customer satisfaction.

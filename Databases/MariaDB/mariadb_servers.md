@@ -3,29 +3,31 @@ The following virtual machine(s) will be created using the PROXMOX Hypervisor Ty
 ___
 1. Access the PROXMOX Hypervisor web interface using a web browser and enter the following url in the specified format:  
     **https://Your-Servers-IP-Address:8006/** 
-2. If a base MariaDB template (**base-mdb-template**) is available, then see the 
-   [MariaDB Server Node Setup](#mariadb-server-node-setup) section, if not continue in **this section** to **Step 3**.   
-3. If a base Ubuntu template (**base-ubuntu-template**) is available, see the **mariadb_template** document then return 
-   and jump to **Step 2** in **this section**, if not continue in **this section** to **Step 4**.  
-4. If no base Ubuntu template is available, then see the **base-ubuntu** build sheet then return to
-   **this section** and jump to **Step 3**.  
-5. Jump to the [Galera Cluster Setup](#galera-cluster-setup) section. 
-6. Jump to the [Galera Arbitrator Setup](#galera-arbitrator-setup) section.
-7. Jump to the [MariaDB Backup Node Setup](#mariadb-backup-node-setup) section.  
-8. Create the MariaDB HAProxy servers using the **mariadb_haproxy** document. 
+2. Create a new virtual machine using one of the following methods:  
+   1. If a base MariaDB template (**base-mdb-template**) is available, then see the  
+      [MariaDB Server Node Setup](#mariadb-server-node-setup) section,
+      if not continue in **this section** to **Step 2.2**.  
+   2. If a base Ubuntu template (**base-ubuntu-template**) is available, see the **mariadb_template** build sheet located
+       on the **CNAS** then jump to **Step 2.1** in **this section**, if not continue in **this section** to **Step 2.3**.  
+   3. If no base Ubuntu template is available, then see the **base-ubuntu** build sheet located on the **CNAS** then 
+      return to **this section** and jump to **Step 2.2**.  
+3. Jump to the [Galera Cluster Setup](#galera-cluster-setup) section. 
+4. Jump to the [Galera Arbitrator Setup](#galera-arbitrator-setup) section.
+5. Create the MariaDB HAProxy servers using the **mariadb_haproxy** document.
 
-## MariaDB Server Node Setup 
+## MariaDB Server Node Setup
 ___
-1. Right click and perform a full clone of the base MariaDB template (**base-mdb-template**) and set the following settings below:  
+1. Right click and perform a full clone of the base MariaDB template (**base-mdb-template**) and set the following settings below:
 
+   > Target node = pm-01 or the PROXMOX node where the MariaDB template has been created    
    > Mode = Full Clone  
-   > Target Storage = Same as source  
-   > Name = mdb-XX (where XX is the server number being created)  
-   > Resource Pool = None  
-   > Format = QEMU image format  
+   > Target Storage = Same as source   
+   > Name = mdb-XX (where XX is the server number being created)    
+   > Resource Pool = None    
+   > Format = QEMU image format    
 
-   > If the virtual machine needs to be under a different PROXMOX node (pm-01, pm-02, ...pm-XX) then initiate a **migration** 
-     to the necessary PROXMOX node before modifying or starting the virtual machine.  
+   > NOTE: If the virtual machine needs to be under a different PROXMOX node (pm-01, pm-02, ...pm-XX) then initiate 
+     a **migration** to the necessary PROXMOX node before modifying or starting the virtual machine.  
 
 2. Add a secondary hard disk to the MariaDB node using the **Hardware** section from the content panel:  
    ![](img/adding_secondary_hard_disk.png)  
@@ -112,11 +114,11 @@ ___
     sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
     ```
     Uncomment and set **datadir = /mdb_pool/mdb_data** in the top **[mariadbd]** section, as in the image below:  
-    ![](img/mariadb_50_server_datadir_var.png)  
+    ![](img/mdb_50_srv_datadir_var.png)  
     Uncomment the various error log variables as in the image below:  
-    ![](img/mariadb_50_server_log.png)  
+    ![](img/mdb_50_srv_log.png)  
     Add the following system variables to the bottom of **[mariadbd]** section to enable the MariaDB server audit plugin:  
-    ![](img/mariadb_50_server_audit_log_plugings.png)
+    ![](img/mdb_50_srv_audit_log_plugings.png)
 14. Create a ZFS pool and file system using the secondary disk:
      1. Temporarily gain superuser privileges using the command below:  
         ```shell
@@ -197,10 +199,9 @@ ___
        ```shell 
        sudo nano /etc/samba/smb.conf
        ```
-       Update the value of the variable **netbios name** to the server node name being created in the **[global]** section. This 
-       should be the only variable that needs to be updated across each server node configuration file. See the image
-       below for clarification:  
-       ![](img/samba_server_config_file.png)  
+       Update the value of the variable **netbios name** to the server node name being created in the **[global]** section.   
+       See the image below for reference:   
+       ![](img/samba_svr_config_file.png)  
     2. Start and enable the **Samba** service using the following command:   
        ```shell
        sudo systemctl enable --now smbd
@@ -253,7 +254,7 @@ ___
        showmount -e cnas-01.research.pemo
        ```
        The following image will show the NFS shares available, from issuing the above command:  
-       ![](./img/nfs_shares_available_on_server.png)   
+       ![](./img/nfs_shares_active.png)   
        **NOTE:** If the NFS share is not available, then check the following on the NAS:   
        1.  Ensure the share folder is created.
        2. Check the location of the share folder.
@@ -261,7 +262,7 @@ ___
 
     6. Mount the external NFS share on machine using a similar command to the following:  
        ```shell
-       sudo mount -t nfs cnas-01.research.pemo:/volume1/scada /mnt/scada/nas
+       sudo mount -t nfs cnas-01.research.pemo:/volume2/scada /mnt/scada/nas
        ```
     7. Allow full permissions (read, write, execute) for the owner, group and others using a similar command to the following:  
        ```shell
@@ -450,7 +451,7 @@ ___
       cnas-01.research.pemo:/volume1/mdb-backup /mnt/mdb_data_backups/nas nfs defaults 0 0  
       ```
       See the image below for reference:   
-      ![](img/fstab_nas_mount.png)   
+      ![](img/fstab_mdb_bkups_mount.png)   
    6. Reboot the machine and verify the mount stays attached using the **df** command:
       ```shell
       sudo df -Th
@@ -504,8 +505,4 @@ ___
    ```shell
    sudo systemctl restart cron
    ```
-9. Jump to **Step 7** in the [MariaDB Server Node Main Content Setup](#mariadb-server-node-main-content-steps) section.  
-
-## MariaDB Backup Node Setup
-___
-1. Jump to **Step 8** in the [MariaDB Server Node Main Content Setup](#mariadb-server-node-main-content-steps) section.
+9. Jump to **Step 7** in the [MariaDB Server Node Main Content Setup](#mariadb-server-node-main-content-steps) section.

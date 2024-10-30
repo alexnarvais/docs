@@ -31,8 +31,7 @@ Run the ignition installer using the following command where "x.x.x" is ignition
 Don't start ignition yet but instead go through the default options.
 After verifying the default options then change directories to where ignition is installed and start ignition using the following commands:
 ```commandline
-cd /usr/local/bin/ignition
-./ignition.sh start
+/usr/local/bin/ignition/ignition.sh start
 ```
 
 

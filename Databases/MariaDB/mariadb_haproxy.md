@@ -268,7 +268,7 @@ ___
        Update the value of the variable **netbios name** to the server node name being created in the **[global]** section. This 
        should be the only variable that needs to be updated across each server node configuration file. See the image   
        below for clarification:  
-       ![](img/samba_server_config_mariadb_haproxy.png)  
+       ![](img/samba_svr_config_mariadb_haproxy.png)  
     2. Start and enable the **Samba** service using the following command:   
        ```shell
        sudo systemctl enable --now smbd
@@ -321,7 +321,7 @@ ___
        showmount -e cnas-01.research.pemo
        ```
        The following image will show the NFS shares available, from issuing the above command:  
-       ![](./img/nfs_shares_available_on_server.png)   
+       ![](./img/nfs_shares_active.png)   
        If the NFS share is not available, then check the following on the NAS:  
        - Ensure the share folder is created.  
        - Check the location of the share folder.  

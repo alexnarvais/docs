@@ -375,7 +375,7 @@ ___
       > **Name** = CVIPSS_Main_MDB04    
         **Description** = This connection is to the MariaDB Backup Node (mdb-04) under PROXMOX 4. The connection is required to run the MariaDB Backup Verification. Disable the connection when finished.    
         **Connection URL** = jdbc:mariadb://mdb-04.research.pemo:3306/cvipss_main  
-        **Username** = Ignition   
+        **Username** = ignition   
         **Password** = <one_extra_rich_capital_cat>   
    3. Access the **Databases Status** page and verify a valid connection using the following path:  
         > Status\CONNECTIONS\Databases

@@ -5,9 +5,9 @@ will join before installing SentinelOne.
 ___
 ## Linux Machines Install
 1. The latest SentinelOne package can be verified and downloaded from the web management console:  
-   ![](./img/sentinels_packages.png)  
+   ![](img/sentinels_packages.png)  
 2. The site token can be viewed and copied by clicking on the correct site:  
-   ![](./img/settings_sites.png)  
+   ![](img/settings_sites.png)  
 3. Install the network file system packages if not already installed using the following command:
    ```shell
    sudo apt install nfs-common
@@ -47,7 +47,7 @@ ___
    sudo nano sentinelone_linux_agent_install.sh
    ```
 10. Open up the SentinelOne web management console and verify the machine joined the site:  
-    ![](./img/sentinels_endpoints.png)  
+    ![](img/sentinels_endpoints.png)  
 
 ___
 ## Windows Machines
@@ -61,11 +61,11 @@ ___
       ```
       Replace the passphrase which can be found under the endpoint name using the web management console 
       with the `string` word but remember to keep the double quotes, see the image below for finding the passphrase:  
-      ![](./img/sentinel_passphrase.png)  
+      ![](img/sentinel_passphrase.png)  
       Uninstall from the web management console using the following image as reference:  
-      ![](./img/sentinel_uninstall_web_console.png)  
+      ![](img/sentinel_uninstall_web_console.png)  
    2. If the machine is not removed (decommissioned) from the Sentinels Endpoint List then remove it manually using the 
       web management console refer to the image below for reference:  
-      ![](./img/sentinel_decommission.png)  
+      ![](img/sentinel_decommission.png)  
 2. #### Windows Machines:  
       

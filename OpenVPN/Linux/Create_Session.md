@@ -25,6 +25,4 @@ Used the following command to disconnect the connection:
 ```shell
 openvpn3 session-manage --config siteautomation-config.ovpn --disconnect
 ```
-___
-
 

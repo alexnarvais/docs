@@ -1,14 +1,16 @@
 services:
     jenkins:
-      container_name: jenkins-docker
+      container_name: jenkins
       image: jenkins/jenkins:lts
       ports:
-        - "8080:8080"
+        - "9080:8080"
       volumes:
-        - "$PWD/jenkins_home:/var/jenkins_home"
+        - jenkins-data:/var/jenkins_home
       networks:
         - jenkins-network
 
 networks:
   jenkins-network:
 
+volumes:
+  jenkins-data:
